@@ -1,30 +1,43 @@
 <script lang="ts">
   import { Button, Dropdown, DropdownItem, Chevron } from "flowbite-svelte";
   // @ts-ignore
-  import FaAlignJustify from "svelte-icons/fa/FaAlignJustify.svelte";
   import FaUser from "svelte-icons/fa/FaUser.svelte";
+
   let search: string;
+  let dateRange: string = 'dtd';
 </script>
 
-<div class='min-h-screen'>
-  <nav class="flex flex-col md:flex-row gap-5 items-center justify-between px-1 py-3 bg-black bg-opacity-80">
+<div class="min-h-screen">
+  <nav
+    class="flex flex-col md:flex-row h-[13vh] md:h-[6vh] items-center justify-between px-1 py-3 bg-black bg-opacity-[85%]">
     <div class="flex gap-5 items-center">
       <a class=" text-white text-3xl pl-3" href="/">TradePeg</a>
       <button
-        class=" hidden md:block  btn btn-link btn-sm text-white h-5  w-5"
-        id="sidebarToggleTablet"><FaAlignJustify />
+        class=" hidden md:block btn btn-link btn-sm text-white h-5 w-5"
+        id="sidebarToggleTablet"
+        ><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 14 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="h-10 -mt-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+        </svg>
       </button>
     </div>
-    <div class="flex gap-2 self-end items-center w-[98%]">
+    <div class="flex gap-2 items-center w-[98%]">
       <button
-      class="md:hidden btn btn-link btn-sm text-white h-5 w-5"
-      id="sidebarTogglePhone"><FaAlignJustify />
-    </button>
-      <form action="" class="relative ml-auto group min-w-180 sm:min-w-200 self-end">
+        class="md:hidden btn btn-link btn-sm text-white h-5 w-5"
+        id="sidebarTogglePhone"
+        ><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 14 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="h-10 -mt-2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+        </svg>
+      </button>
+      <form
+        action=""
+        class="relative ml-auto group min-w-180 sm:min-w-200 self-end"
+      >
         <input
           bind:value={search}
           type="search"
-          class="transition-all duration-1000 group-focus-within:w-[160px] xs:group-focus-within:w-[200px] focus:pl-10 focus:ring-white focus:border-white focus-focus-within:cursor-text focus:white cursor-pointer relative z-10 h-10 w-10 rounded-md border bg-transparent text-white outline-none"
+          class="transition-all duration-1000 group-focus-within:w-[160px] xs:group-focus-within:w-[200px] focus:pl-10
+           focus:ring-white focus:border-white focus-focus-within:cursor-text focus:white cursor-pointer relative z-10 
+           h-10 w-10 rounded-md border bg-transparent text-white outline-none search-cancel:appearance-none "
         />
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -43,20 +56,38 @@
       </form>
       <!-- Navbar-->
       <Button
-        class="px-0.5 hover:bg-transparent bg-transparent focus:border-0 focus:!ring-0 focus:bg-transparent">
+        class="!p-1.5 hover:bg-transparent bg-transparent focus:border-0 focus:!ring-0 focus:bg-transparent"
+      >
         <Chevron>
-          <div class="h-5 w">
+          <div class="h-6 ">
             <FaUser />
           </div>
         </Chevron>
       </Button>
-      <Dropdown class='w-[120px]'>
+      <Dropdown class="w-[120px]">
         <DropdownItem>Settings</DropdownItem>
         <DropdownItem>Activity Log</DropdownItem>
         <DropdownItem>Logout</DropdownItem>
       </Dropdown>
     </div>
   </nav>
-  <div class="flex h-[93.4vh]">  <nav class=" md:w-[25%] lg:w-[11%] h-full bg-black bg-opacity-80"></nav><div></div></div>
-
+  <div class="flex h-[87vh] md:h-[94vh]">
+    <nav class=" md:w-[25%] lg:w-[11%] h-full bg-black bg-opacity-[85%]" />
+    <div class="pt-10 px-5 md:px-28 w-full">
+      <div class="flex flex-col md:flex-row gap-5 md:gap-0 items-center  justify-between">
+        <h2 class="text-[35px] ">Overview</h2>
+        <select
+        bind:value={dateRange}
+          id="countries"
+          class="w-[150px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        >
+          <option selected value="dtd">Day to date</option>
+          <option value="wtd">Week to date</option>
+          <option value="mtd">Month to date</option>
+          <option value="qtd">Quarter to date</option>
+          <option value="ytd">Year to date</option>
+        </select>
+      </div>
+    </div>
+  </div>
 </div>
