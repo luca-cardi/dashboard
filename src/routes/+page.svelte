@@ -1,10 +1,10 @@
 <script lang="ts">
-	
   import { Button, Dropdown, DropdownItem, Chevron } from "flowbite-svelte";
+
+  // @ts-ignore
   import FaAlignJustify from "svelte-icons/fa/FaAlignJustify.svelte";
   import FaUser from "svelte-icons/fa/FaUser.svelte";
   let search: string;
-
 </script>
 
 <nav class="flex items-center justify-between p-4 bg-black bg-opacity-85">
@@ -38,7 +38,10 @@
       </svg>
     </form>
     <!-- Navbar-->
-    <Button class="px-0.5 focus:ring-0 focus:bg-transparent"><Chevron><div class="h-5 w"><FaUser /></div></Chevron></Button>
+    <Button
+      class="px-0.5 hover:bg-transparent bg-transparent focus:border-0 focus:!ring-0 focus:bg-transparent"
+      ><Chevron><div class="h-5 w"><FaUser /></div></Chevron></Button
+    >
     <Dropdown>
       <DropdownItem>Settings</DropdownItem>
       <DropdownItem>Activity Log</DropdownItem>
