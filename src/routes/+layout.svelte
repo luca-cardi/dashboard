@@ -4,8 +4,6 @@
 
 <svelte:head>
 	<title>Dashborad</title>
-
-
 </svelte:head>
 
 <slot />
