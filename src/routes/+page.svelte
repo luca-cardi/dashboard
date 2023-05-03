@@ -1,22 +1,85 @@
 <script lang="ts">
-  import { Button, Dropdown, DropdownItem, Chevron } from "flowbite-svelte";
+  import { page } from "$app/stores";
+  import { Button, Chevron, Dropdown, DropdownItem } from "flowbite-svelte";
+  import { onMount } from "svelte";
   // @ts-ignore
+  import axios from "axios";
   import FaUser from "svelte-icons/fa/FaUser.svelte";
+  import CardStats from "../components/CardStats.svelte";
+
+  import type { SalesByDate } from "../types/salesByDate";
 
   let search: string;
-  let dateRange: string = 'dtd';
+  let dateRange: string = "dtd";
+
+  let channelName: string;
+  let salesValueNet: number;
+  let salesValueGross: number;
+  let orders: number;
+  let itemsSold: number;
+  let grossProfit: number;
+  let grossProfitMarkup: number;
+  let grossProfitMargin: number;
+
+  let salesByDate: SalesByDate;
+  let user: {};
+  let reportsByDate: {};
+
+  onMount(async () => {
+    /*     const urlParams = new URLSearchParams(window.location.search);
+    const isBeta = urlParams.has('apiKey');
+   */
+    const API_KEY = $page.url.searchParams.get("apiKey");
+    axios.defaults.headers.common["  Authorization"] = API_KEY;
+    const baseUrl = "https://api-prod.tradepeg.com";
+
+    try {
+      const resSalesByDate = await axios.get(
+        baseUrl + "/reports/sales-overview/summary/" + dateRange
+      );
+
+      salesByDate = resSalesByDate.data;
+
+      const resUser = await axios.get(baseUrl + "/user/self");
+      user = resUser.data;
+
+      /*       const resReportsByDate = await axios.get(
+        baseUrl + "/reports/ranges/" + dateRange
+      );
+      reportsByDate = resReportsByDate.data; */
+
+      console.log("salesByDate:", salesByDate);
+      console.log("user:", user);
+      console.log("reportsByDate", reportsByDate);
+    } catch (error) {
+      console.log(error);
+    }
+  });
 </script>
 
 <div class="min-h-screen">
   <nav
-    class="flex flex-col md:flex-row h-[13vh] md:h-[6vh] items-center justify-between px-1 py-3 bg-black bg-opacity-[85%]">
+    class="flex flex-col md:flex-row h-[13vh] md:h-[6vh] items-center justify-between px-1 py-3 bg-black bg-opacity-[85%]"
+  >
     <div class="flex gap-5 items-center">
       <a class=" text-white text-3xl pl-3" href="/">TradePeg</a>
       <button
         class=" hidden md:block btn btn-link btn-sm text-white h-5 w-5"
         id="sidebarToggleTablet"
-        ><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 14 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="h-10 -mt-2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+        ><svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          viewBox="0 0 14 24"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          class="h-10 -mt-2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+          />
         </svg>
       </button>
     </div>
@@ -24,8 +87,20 @@
       <button
         class="md:hidden btn btn-link btn-sm text-white h-5 w-5"
         id="sidebarTogglePhone"
-        ><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 14 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="h-10 -mt-2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+        ><svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          viewBox="0 0 14 24"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          class="h-10 -mt-2.5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+          />
         </svg>
       </button>
       <form
@@ -36,8 +111,8 @@
           bind:value={search}
           type="search"
           class="transition-all duration-1000 group-focus-within:w-[160px] xs:group-focus-within:w-[200px] focus:pl-10
-           focus:ring-white focus:border-white focus-focus-within:cursor-text focus:white cursor-pointer relative z-10 
-           h-10 w-10 rounded-md border bg-transparent text-white outline-none search-cancel:appearance-none "
+           focus:ring-white focus:border-white focus-focus-within:cursor-text focus:white cursor-pointer relative z-10
+           h-10 w-10 rounded-md border bg-transparent text-white outline-none search-cancel:appearance-none"
         />
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +134,7 @@
         class="!p-1.5 hover:bg-transparent bg-transparent focus:border-0 focus:!ring-0 focus:bg-transparent"
       >
         <Chevron>
-          <div class="h-6 ">
+          <div class="h-6">
             <FaUser />
           </div>
         </Chevron>
@@ -74,10 +149,12 @@
   <div class="flex h-[87vh] md:h-[94vh]">
     <nav class=" md:w-[25%] lg:w-[11%] h-full bg-black bg-opacity-[85%]" />
     <div class="pt-10 px-5 md:px-28 w-full">
-      <div class="flex flex-col md:flex-row gap-5 md:gap-0 items-center  justify-between">
-        <h2 class="text-[35px] ">Overview</h2>
+      <div
+        class="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between"
+      >
+        <h2 class="text-[35px]">Overview</h2>
         <select
-        bind:value={dateRange}
+          bind:value={dateRange}
           id="countries"
           class="w-[150px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         >
@@ -87,7 +164,28 @@
           <option value="qtd">Quarter to date</option>
           <option value="ytd">Year to date</option>
         </select>
+        {#if salesByDate}
+          <p>
+            {salesByDate.dateRanges.range1.start}/{salesByDate.dateRanges.range1
+              .end}
+          </p>
+        {:else}
+          <p />
+        {/if}
       </div>
+      {#if salesByDate}
+        <CardStats
+          statTitle={"Sales Value"}
+          result={salesByDate.results.salesValueNet}
+          previous={salesByDate.previous.salesValueNet}
+        />
+      {:else}
+        <p />
+      {/if}
+
+      <!--         <CardStats statTitle={"Order count"} result={salesByDate.results.orders} previous={salesByDate.previous.orders} />
+      <CardStats statTitle={"Item Sold"} result={salesByDate.results.itemSold} previous={salesByDate.previous.itemSold}  />
+      <CardStats statTitle={"Gross Profit"} result={salesByDate.results.grossProfit} previous={salesByDate.previous.grossProfit} /> -->
     </div>
   </div>
 </div>
