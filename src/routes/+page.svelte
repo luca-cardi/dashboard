@@ -22,7 +22,11 @@
 
   let salesByDate: SalesByDateType;
   let user: UserType;
-  let performanceByDate: PerformanceBydateType;
+  let performanceByDate: PerformanceBydateType[];
+
+  let salesPerformanceBydate: any;
+  salesPerformanceBydate;
+
   let reportsByDate;
   let dateStartFormatted: string | string[];
   let dateEndFormatted: string | string[];
@@ -65,7 +69,6 @@
     try {
       loading = true;
       if (!axios.defaults.headers.common["Authorization"]) {
-        console.log("called");
         await getApiKey();
       }
 
@@ -103,6 +106,9 @@
       );
 
       performanceByDate = resPerformanceByDate.data.results;
+      salesPerformanceBydate = performanceByDate.map(
+        ({ dateName, salesValueGross }) => ({ dateName, salesValueGross })
+      );
 
       loading = false;
       /*       console.log("salesByDate:", salesByDate); */
@@ -336,11 +342,17 @@
           {/if}
         {/await}
       </div>
-      <CardLineChart
-        data={performanceByDate}
-        label1={"Sales Value"}
-        label2={"Gross Profit"}
-      />
+      {#await fetchDataSummary()}
+        <p />
+      {:then _}
+        {#if loading}
+          <p />
+        {:else}<CardLineChart
+            data={salesPerformanceBydate}
+            label1={"Sales Value"}
+            label2={"Gross Profit"}
+          />{/if}
+      {/await}
     </div>
   </div>
 </div>

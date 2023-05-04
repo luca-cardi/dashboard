@@ -1,51 +1,39 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import type { PerformanceBydateType } from "../types/performanceBydate";
   // library that creates chart objects in page
   import { Chart, registerables } from "chart.js";
   Chart.register(...registerables);
 
-  export let data;
-  export let label1;
+  export let data: PerformanceBydateType[];
+  export let label1 : string;
   export let label2;
 
-  let data1;
-  let data2;
+console.log(data.map(key => key.salesValueGross))
 
-  if (data) {
-    data1 = data.map(({ dateName, label1 }) => ({ dateName, label1 }));
-    console.log(data1);
-  }
 
   // init chart
   onMount(async () => {
     var config = {
       type: "line",
       data: {
-        labels: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-        ],
+        labels: data.map(key => key.dateName ),
         datasets: [
           {
-            label: "label1",
-            tension: 0.4,
+            label: label1,
+            tension: 0.5,
             backgroundColor: "#4c51bf",
             borderColor: "#4c51bf",
-            data: "Data1.map()",
+            data: data.map(key => key.salesValueGross),
             fill: false,
-          },
-          {
+          }
+   /*        {
             label: "label2",
             tension: 0.4,
             data: "Data2.map()",
             backgroundColor: "#fff",
             borderColor: "#fff",
-          },
+          }, */
         ],
       },
       options: {
