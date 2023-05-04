@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 export default {
   content: [
     "./src/**/*.{html,js,svelte,ts}",
@@ -6,6 +8,12 @@ export default {
     "./node_modules/flowbite/**/*.{html,js,svelte,ts}",
   ],
   theme: {
+    fontFamily: {
+
+      'lato': ["Lato", "sans-serif"],
+      'mono': ["Open Sans", "sans-serif"],     
+       'robo': ["Roboto", "sans-serif"],
+    },
     extend: {},
     screens: {
       xs: { min: "400px" },

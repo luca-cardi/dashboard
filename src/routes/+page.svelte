@@ -1,9 +1,22 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import { Button, Chevron, Dropdown, DropdownItem } from "flowbite-svelte";
+
+  import {
+    CardPlaceholder,
+    ImagePlaceholder,
+    ListPlaceholder,
+    Skeleton,
+    TestimonialPlaceholder,
+    TextPlaceholder,
+    VideoPlaceholder,
+    WidgetPlaceholder,
+  } from "flowbite-svelte";
+
   import { onMount } from "svelte";
-  // @ts-ignore
+
   import axios from "axios";
+  // @ts-ignore
   import FaUser from "svelte-icons/fa/FaUser.svelte";
   import CardStats from "../components/CardStats.svelte";
 
@@ -11,6 +24,9 @@
 
   let search: string;
   let dateRange: string = "dtd";
+  const baseUrl = "https://api-prod.tradepeg.com";
+
+  $: dateRange, fetchDataSummary();
 
   let channelName: string;
   let salesValueNet: number;
@@ -20,26 +36,34 @@
   let grossProfit: number;
   let grossProfitMarkup: number;
   let grossProfitMargin: number;
+  let promiseSummary: any;
 
   let salesByDate: SalesByDate;
   let user: {};
   let reportsByDate: {};
 
-  onMount(async () => {
-    /*     const urlParams = new URLSearchParams(window.location.search);
+  /*  onMount(async () => {
+       const urlParams = new URLSearchParams(window.location.search);
     const isBeta = urlParams.has('apiKey');
-   */
+ 
     const API_KEY = $page.url.searchParams.get("apiKey");
-    axios.defaults.headers.common["  Authorization"] = API_KEY;
-    const baseUrl = "https://api-prod.tradepeg.com";
 
+    // hardcoded at the moment
+    axios.defaults.headers.common["Authorization"] =
+      "dG9rZW58eW5jOjI0OjNYMGdBZjlkWnBrSUJjUGJITHd4UktZak9scVZKVUc3NWhteXo0NnJlTU5pQ3NGdGF1MTJURVdvOHZuU1FEVmhlUDZ5QkdRT21jWDhaYnVMa0hSUzlLaUNXTTVucmdvRVlmbHQ0cElOYVQydmRKRlVqM3d6MXF4MERzN0F6UVVhZjZBdG5ZcHhpTTRxRzUzdks4ZUhtMVA5aHNSZGMwRlpCQ1hrREpOdVdvMmpUVmd3bE83eUlTRUxicmhkZ0ZwVTlsTmtNRXRYVHhXMEIyTGVmNEhWQ3FZWlNqS25zeVFpUGJvRHZSSnJ1T3dhN2N6OG1BNTZJM0cxWTFUZjBTOWs=";
+
+    fetchDataSummary();
+  })
+ */
+  const getApiKey = async () => {
+    const API_KEY = $page.url.searchParams.get("apiKey");
+    // hardcoded at the moment
+    axios.defaults.headers.common["Authorization"] =
+      "dG9rZW58eW5jOjI0OjNYMGdBZjlkWnBrSUJjUGJITHd4UktZak9scVZKVUc3NWhteXo0NnJlTU5pQ3NGdGF1MTJURVdvOHZuU1FEVmhlUDZ5QkdRT21jWDhaYnVMa0hSUzlLaUNXTTVucmdvRVlmbHQ0cElOYVQydmRKRlVqM3d6MXF4MERzN0F6UVVhZjZBdG5ZcHhpTTRxRzUzdks4ZUhtMVA5aHNSZGMwRlpCQ1hrREpOdVdvMmpUVmd3bE83eUlTRUxicmhkZ0ZwVTlsTmtNRXRYVHhXMEIyTGVmNEhWQ3FZWlNqS25zeVFpUGJvRHZSSnJ1T3dhN2N6OG1BNTZJM0cxWTFUZjBTOWs=";
+  };
+
+  const fetchUser = async () => {
     try {
-      const resSalesByDate = await axios.get(
-        baseUrl + "/reports/sales-overview/summary/" + dateRange
-      );
-
-      salesByDate = resSalesByDate.data;
-
       const resUser = await axios.get(baseUrl + "/user/self");
       user = resUser.data;
 
@@ -47,17 +71,36 @@
         baseUrl + "/reports/ranges/" + dateRange
       );
       reportsByDate = resReportsByDate.data; */
-
-      console.log("salesByDate:", salesByDate);
       console.log("user:", user);
       console.log("reportsByDate", reportsByDate);
     } catch (error) {
       console.log(error);
     }
-  });
+  };
+
+  const fetchDataSummary = async () => {
+    try {
+      await getApiKey();
+      const resSalesByDate = await axios.get(
+        baseUrl + "/reports/sales-overview/summary/" + dateRange
+      );
+
+      salesByDate = resSalesByDate.data;
+
+      /*       const resReportsByDate = await axios.get(
+        baseUrl + "/reports/ranges/" + dateRange
+      );
+      reportsByDate = resReportsByDate.data; */
+
+      console.log("salesByDate:", salesByDate);
+      console.log("reportsByDate", reportsByDate);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 </script>
 
-<div class="min-h-screen">
+<div class="min-h-screen font-sans">
   <nav
     class="flex flex-col md:flex-row h-[13vh] md:h-[6vh] items-center justify-between px-1 py-3 bg-black bg-opacity-[85%]"
   >
@@ -147,8 +190,8 @@
     </div>
   </nav>
   <div class="flex h-[87vh] md:h-[94vh]">
-    <nav class=" md:w-[25%] lg:w-[11%] h-full bg-black bg-opacity-[85%]" />
-    <div class="pt-10 px-5 md:px-28 w-full">
+    <nav class="  lg:w-[11%] h-full bg-black bg-opacity-[85%]" />
+    <div class="pt-10 px-5 md:px-10 w-full">
       <div
         class="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between"
       >
@@ -164,28 +207,52 @@
           <option value="qtd">Quarter to date</option>
           <option value="ytd">Year to date</option>
         </select>
-        {#if salesByDate}
+        {#await fetchDataSummary()}
+          <p />
+        {:then _}
           <p>
             {salesByDate.dateRanges.range1.start}/{salesByDate.dateRanges.range1
               .end}
           </p>
-        {:else}
-          <p />
-        {/if}
+        {/await}
       </div>
-      {#if salesByDate}
-        <CardStats
-          statTitle={"Sales Value"}
-          result={salesByDate.results.salesValueNet}
-          previous={salesByDate.previous.salesValueNet}
-        />
-      {:else}
-        <p />
-      {/if}
-
-      <!--         <CardStats statTitle={"Order count"} result={salesByDate.results.orders} previous={salesByDate.previous.orders} />
-      <CardStats statTitle={"Item Sold"} result={salesByDate.results.itemSold} previous={salesByDate.previous.itemSold}  />
-      <CardStats statTitle={"Gross Profit"} result={salesByDate.results.grossProfit} previous={salesByDate.previous.grossProfit} /> -->
+      <div class="flex gap-3 flex-wrap justify-center  sm:justify-between mt-16">
+        {#await fetchDataSummary()}
+          {#each { length: 4 } as _, i}
+            <CardStats
+              statTitle={null}
+              result={null}
+              previous={null}
+              {dateRange}
+            />
+          {/each}
+        {:then _}
+          <CardStats
+            statTitle={"Sales Value"}
+            result={salesByDate.results.salesValueNet}
+            previous={salesByDate.previous.salesValueNet}
+            {dateRange}
+          />
+          <CardStats
+            statTitle={"Order Count"}
+            result={salesByDate.results.orders}
+            previous={salesByDate.previous.orders}
+            {dateRange}
+          />
+          <CardStats
+            statTitle={"Item Sold"}
+            result={salesByDate.results.itemsSold}
+            previous={salesByDate.previous.itemsSold}
+            {dateRange}
+          />
+          <CardStats
+            statTitle={"Gross Profit"}
+            result={salesByDate.results.grossProfit}
+            previous={salesByDate.previous.grossProfit}
+            {dateRange}
+          />
+        {/await}
+      </div>
     </div>
   </div>
 </div>
