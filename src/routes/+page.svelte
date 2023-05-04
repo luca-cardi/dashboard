@@ -2,17 +2,6 @@
   import { page } from "$app/stores";
   import { Button, Chevron, Dropdown, DropdownItem } from "flowbite-svelte";
 
-  import {
-    CardPlaceholder,
-    ImagePlaceholder,
-    ListPlaceholder,
-    Skeleton,
-    TestimonialPlaceholder,
-    TextPlaceholder,
-    VideoPlaceholder,
-    WidgetPlaceholder,
-  } from "flowbite-svelte";
-
   import { onMount } from "svelte";
 
   import axios from "axios";
@@ -20,7 +9,8 @@
   import FaUser from "svelte-icons/fa/FaUser.svelte";
   import CardStats from "../components/CardStats.svelte";
 
-  import type { SalesByDate } from "../types/salesByDate";
+  import type { SalesByDateType } from "../types/salesByDate";
+  import type { UserType } from "../types/user";
 
   let search: string;
   let dateRange: string = "dtd";
@@ -28,19 +18,13 @@
 
   $: dateRange, fetchDataSummary();
 
-  let channelName: string;
-  let salesValueNet: number;
-  let salesValueGross: number;
-  let orders: number;
-  let itemsSold: number;
-  let grossProfit: number;
-  let grossProfitMarkup: number;
-  let grossProfitMargin: number;
-  let promiseSummary: any;
-
-  let salesByDate: SalesByDate;
-  let user: {};
+  let salesByDate: SalesByDateType;
+  let user: UserType;
   let reportsByDate: {};
+  let date1: string | string[];
+  let date2: string | string[];
+
+  let loading: boolean = false;
 
   /*  onMount(async () => {
        const urlParams = new URLSearchParams(window.location.search);
@@ -67,12 +51,12 @@
       const resUser = await axios.get(baseUrl + "/user/self");
       user = resUser.data;
 
-      /*       const resReportsByDate = await axios.get(
+      /*       
+      onst resReportsByDate = await axios.get(
         baseUrl + "/reports/ranges/" + dateRange
       );
       reportsByDate = resReportsByDate.data; */
       console.log("user:", user);
-      console.log("reportsByDate", reportsByDate);
     } catch (error) {
       console.log(error);
     }
@@ -80,20 +64,29 @@
 
   const fetchDataSummary = async () => {
     try {
-      await getApiKey();
+      loading = true;
+      if (!axios.defaults.headers.common["Authorization"]) {
+        console.log("called");
+        await getApiKey();
+      }
+
       const resSalesByDate = await axios.get(
         baseUrl + "/reports/sales-overview/summary/" + dateRange
       );
 
       salesByDate = resSalesByDate.data;
 
+      date1 = salesByDate.dateRanges.range1.start.split("-");
+      date1 = date1[2] + "/" + date1[1] + "/" + date1[0].substring(2);
+      date2 = salesByDate.dateRanges.range1.end.split("-");
+      date2 = date2[2] + "/" + date2[1] + "/" + date2[0].substring(2);
+
       /*       const resReportsByDate = await axios.get(
         baseUrl + "/reports/ranges/" + dateRange
       );
       reportsByDate = resReportsByDate.data; */
-
+      loading = false;
       console.log("salesByDate:", salesByDate);
-      console.log("reportsByDate", reportsByDate);
     } catch (error) {
       console.log(error);
     }
@@ -105,7 +98,7 @@
     class="flex flex-col md:flex-row h-[13vh] md:h-[6vh] items-center justify-between px-1 py-3 bg-black bg-opacity-[85%]"
   >
     <div class="flex gap-5 items-center">
-      <a class=" text-white text-3xl pl-3" href="/">TradePeg</a>
+      <a class="  text-white text-3xl pl-3" href="/">TradePeg</a>
       <button
         class=" hidden md:block btn btn-link btn-sm text-white h-5 w-5"
         id="sidebarToggleTablet"
@@ -195,28 +188,87 @@
       <div
         class="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between"
       >
-        <h2 class="text-[35px]">Overview</h2>
+        <h2 class="hidden sm:block text-[30px] font-bold">DASHBOARD</h2>
+        <div class="flex flex-col-reverse sm:flex-row items-center gap-10">
+          
+          <div class="flex flex-col items-center gap-1">
         <select
-          bind:value={dateRange}
-          id="countries"
-          class="w-[150px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        >
-          <option selected value="dtd">Day to date</option>
-          <option value="wtd">Week to date</option>
-          <option value="mtd">Month to date</option>
-          <option value="qtd">Quarter to date</option>
-          <option value="ytd">Year to date</option>
-        </select>
-        {#await fetchDataSummary()}
-          <p />
-        {:then _}
-          <p>
-            {salesByDate.dateRanges.range1.start}/{salesByDate.dateRanges.range1
-              .end}
-          </p>
-        {/await}
+              bind:value={dateRange}
+              id="countries"
+              class="w-[170px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option selected value="dtd">Day to date</option>
+              <option value="wtd">Week to date</option>
+              <option value="mtd">Month to date</option>
+              <option value="qtd">Quarter to date</option>
+              <option value="ytd">Year to date</option>
+            </select>
+            {#await fetchDataSummary()}
+              <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+                <div
+                  class="h-[30px] bg-gray-200 rounded-full dark:bg-gray-700 w-[73px]"
+                />
+              </div>
+            {:then _}
+              <div class="flex items-center justify-between w-[170px]">
+                {#if loading}
+                  <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+                    <div
+                      class="h-[30px] bg-gray-200 rounded-md dark:bg-gray-700 w-[73px]"
+                    />
+                  </div>{:else}
+                  <p
+                    class=" bg-gray-50 border-gray-300 border-[1px] p-[2px] rounded-md"
+                  >
+                    {date1}
+                  </p>{/if}
+
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-4 h-4 text-gray-600"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
+                  />
+                </svg>
+                {#if loading}
+                  <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+                    <div
+                      class="h-7 bg-gray-200 rounded-md dark:bg-gray-700 w-16"
+                    />
+                  </div>
+                {:else}
+                  <p
+                    class=" bg-gray-50 border-gray-300 border-[1px] p-[2px] rounded-md"
+                  >
+                    {date2}
+                  </p>{/if}
+              </div>
+            {/await}
+          </div>
+          {#await fetchUser()}
+            <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+              <div class="h-3 bg-gray-200 rounded-full dark:bg-gray-700 w-30" />
+            </div>
+          {:then _}
+            <div class="flex items-center gap-3">
+              <h2 class=" sm:hidden text-[20px] mr-10 font-bold">DASHBOARD</h2>
+              <div>
+                <p class="font-bold text-lg text-center">{user.organization.name}</p>
+                <p class="text-sm text-center">{user.role}</p>
+              </div>
+              <img class="h-16" src={user.organization.logo} alt="logo" />
+            </div>
+          {/await}
+        </div>
       </div>
-      <div class="flex gap-3 flex-wrap justify-center  sm:justify-between mt-16">
+      <div class="flex gap-3 flex-wrap justify-center sm:justify-between mt-16">
         {#await fetchDataSummary()}
           {#each { length: 4 } as _, i}
             <CardStats
@@ -227,30 +279,41 @@
             />
           {/each}
         {:then _}
-          <CardStats
-            statTitle={"Sales Value"}
-            result={salesByDate.results.salesValueNet}
-            previous={salesByDate.previous.salesValueNet}
-            {dateRange}
-          />
-          <CardStats
-            statTitle={"Order Count"}
-            result={salesByDate.results.orders}
-            previous={salesByDate.previous.orders}
-            {dateRange}
-          />
-          <CardStats
-            statTitle={"Item Sold"}
-            result={salesByDate.results.itemsSold}
-            previous={salesByDate.previous.itemsSold}
-            {dateRange}
-          />
-          <CardStats
-            statTitle={"Gross Profit"}
-            result={salesByDate.results.grossProfit}
-            previous={salesByDate.previous.grossProfit}
-            {dateRange}
-          />
+          {#if loading}
+            {#each { length: 4 } as _, i}
+              <CardStats
+                statTitle={null}
+                result={null}
+                previous={null}
+                {dateRange}
+              />
+            {/each}
+          {:else}
+            <CardStats
+              statTitle={"Sales Value"}
+              result={salesByDate.results.salesValueNet}
+              previous={salesByDate.previous.salesValueNet}
+              {dateRange}
+            />
+            <CardStats
+              statTitle={"Order Count"}
+              result={salesByDate.results.orders}
+              previous={salesByDate.previous.orders}
+              {dateRange}
+            />
+            <CardStats
+              statTitle={"Item Sold"}
+              result={salesByDate.results.itemsSold}
+              previous={salesByDate.previous.itemsSold}
+              {dateRange}
+            />
+            <CardStats
+              statTitle={"Gross Profit"}
+              result={salesByDate.results.grossProfit}
+              previous={salesByDate.previous.grossProfit}
+              {dateRange}
+            />
+          {/if}
         {/await}
       </div>
     </div>

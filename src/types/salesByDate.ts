@@ -1,4 +1,4 @@
-export type SalesByDate = {
+export type SalesByDateType = {
   dateRanges: {
     range1: { start: string; end: string };
     range2: { start: string; end: string };

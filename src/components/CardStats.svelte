@@ -15,7 +15,16 @@
   export let result: number | null;
   export let previous: number | null;
   export let dateRange: string;
-  console.log(result, previous, dateRange);
+
+  let percentage: string = "";
+  
+  if (result && previous) {
+    if (result > previous) {
+      percentage = (((result - previous) / previous) * 100).toFixed(2);
+    } else {
+      percentage = (((previous - result) / previous) * 100).toFixed(2);
+    }
+  }
 
   import FaChartLine from "svelte-icons/fa/FaChartLine.svelte"; // profit
   import FaPoundSign from "svelte-icons/fa/FaPoundSign.svelte"; // sales
@@ -36,7 +45,7 @@
 </script>
 
 <div
-  class="relative flex flex-col justify-between min-w-0 w-[300px] sm:w-[340px] md:w-[320px] h-[150px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+  class="relative flex flex-col justify-between min-w-0 w-[100%] xs:w-[90%] sm:w-[340px] md:w-[330px] h-[150px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
 >
   <div class="flex-auto p-4">
     <div class="flex flex-wrap">
@@ -47,7 +56,7 @@
           </h5>
           <span class="font-semibold text-2xl text-blueGray-700">
             {#if statTitle === "Sales Value" || statTitle === "Gross Profit"}
-              £ {result}
+              £ {result.toLocaleString()}
             {:else}
               {result}
             {/if}
@@ -82,6 +91,11 @@
         {:else if statTitle === "Gross Profit"}
           <div class="bg-red-500 rounded-full p-3 text-xs text-white w-12 h-12">
             <FaChartLine />
+          </div>{:else}
+          <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+            <div
+              class="h-12 bg-gray-200 rounded-full dark:bg-gray-700 w-12 mt-1.5"
+            />
           </div>{/if}
       </div>
     </div>
@@ -125,9 +139,9 @@
         <span
           class={result / previous > 1 ? " text-green-500" : "text-red-600"}
         >
-          {((previous / result) * 100).toFixed(2)}%</span
+          {percentage}%</span
         >
-        <span class=" ml-4">
+        <span class=" ml-3">
           {#if dateRange === "dtd"}
             Since yesterday
           {:else if dateRange === "wtd"}
@@ -142,12 +156,12 @@
         >
 
         <div class="relative w-auto pl-4 flex-initial ml-auto text-center">
-          <h6 class="text-blueGray-400 uppercase font-bold text-xs">
+          <h6 class="text-blueGray-400 uppercase font-bold text-[12px]">
             Previous
           </h6>
-          <span class="font-semibolzd text-md text-blueGray-700">
+          <span class="font-semibolzd text-sm text-blueGray-700">
             {#if statTitle === "Sales Value" || statTitle === "Gross Profit"}
-              £{previous}
+              £{previous.toLocaleString()}
             {:else}
               {previous}
             {/if}
@@ -156,7 +170,7 @@
       {:else}
         <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
           <div
-            class="h-3 bg-gray-200 rounded-full dark:bg-gray-700 w-40 mt-2"
+            class="h-5 bg-gray-200 rounded-full dark:bg-gray-700 w-64 mt-[20px]"
           />
         </div>
       {/if}
