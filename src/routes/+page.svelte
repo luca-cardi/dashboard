@@ -8,9 +8,11 @@
   // @ts-ignore
   import FaUser from "svelte-icons/fa/FaUser.svelte";
   import CardStats from "../components/CardStats.svelte";
+  import CardLineChart from "../components/CardLineChart.svelte";
 
   import type { SalesByDateType } from "../types/salesByDate";
   import type { UserType } from "../types/user";
+  import type { PerformanceBydateType } from "../types/performanceBydate";
 
   let search: string;
   let dateRange: string = "dtd";
@@ -20,9 +22,12 @@
 
   let salesByDate: SalesByDateType;
   let user: UserType;
-  let reportsByDate: {};
-  let date1: string | string[];
-  let date2: string | string[];
+  let performanceByDate: PerformanceBydateType;
+  let reportsByDate;
+  let dateStartFormatted: string | string[];
+  let dateEndFormatted: string | string[];
+  let dateStart;
+  let dateEnd;
 
   let loading: boolean = false;
 
@@ -50,13 +55,7 @@
     try {
       const resUser = await axios.get(baseUrl + "/user/self");
       user = resUser.data;
-
-      /*       
-      onst resReportsByDate = await axios.get(
-        baseUrl + "/reports/ranges/" + dateRange
-      );
-      reportsByDate = resReportsByDate.data; */
-      console.log("user:", user);
+      /*     console.log("user:", user); */
     } catch (error) {
       console.log(error);
     }
@@ -76,17 +75,37 @@
 
       salesByDate = resSalesByDate.data;
 
-      date1 = salesByDate.dateRanges.range1.start.split("-");
-      date1 = date1[2] + "/" + date1[1] + "/" + date1[0].substring(2);
-      date2 = salesByDate.dateRanges.range1.end.split("-");
-      date2 = date2[2] + "/" + date2[1] + "/" + date2[0].substring(2);
+      dateStart = salesByDate.dateRanges.range1.start;
+      dateEnd = salesByDate.dateRanges.range1.end;
 
-      /*       const resReportsByDate = await axios.get(
-        baseUrl + "/reports/ranges/" + dateRange
+      //format data for ui
+      dateStartFormatted = salesByDate.dateRanges.range1.start.split("-");
+      dateStartFormatted =
+        dateStartFormatted[2] +
+        "/" +
+        dateStartFormatted[1] +
+        "/" +
+        dateStartFormatted[0].substring(2);
+      dateEndFormatted = salesByDate.dateRanges.range1.end.split("-");
+      dateEndFormatted =
+        dateEndFormatted[2] +
+        "/" +
+        dateEndFormatted[1] +
+        "/" +
+        dateEndFormatted[0].substring(2);
+
+      const resPerformanceByDate = await axios.get(
+        baseUrl +
+          "/reports/sales-overview/performance/daily?start=" +
+          dateStart +
+          "&end=" +
+          dateEnd
       );
-      reportsByDate = resReportsByDate.data; */
+
+      performanceByDate = resPerformanceByDate.data.results;
+
       loading = false;
-      console.log("salesByDate:", salesByDate);
+      /*       console.log("salesByDate:", salesByDate); */
     } catch (error) {
       console.log(error);
     }
@@ -190,9 +209,8 @@
       >
         <h2 class="hidden sm:block text-[30px] font-bold">DASHBOARD</h2>
         <div class="flex flex-col-reverse sm:flex-row items-center gap-10">
-          
           <div class="flex flex-col items-center gap-1">
-        <select
+            <select
               bind:value={dateRange}
               id="countries"
               class="w-[170px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -220,7 +238,7 @@
                   <p
                     class=" bg-gray-50 border-gray-300 border-[1px] p-[2px] rounded-md"
                   >
-                    {date1}
+                    {dateStartFormatted}
                   </p>{/if}
 
                 <svg
@@ -240,14 +258,14 @@
                 {#if loading}
                   <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
                     <div
-                      class="h-7 bg-gray-200 rounded-md dark:bg-gray-700 w-16"
+                      class="h-[30px] bg-gray-200 rounded-md dark:bg-gray-700 w-[73px]"
                     />
                   </div>
                 {:else}
                   <p
                     class=" bg-gray-50 border-gray-300 border-[1px] p-[2px] rounded-md"
                   >
-                    {date2}
+                    {dateEndFormatted}
                   </p>{/if}
               </div>
             {/await}
@@ -260,7 +278,9 @@
             <div class="flex items-center gap-3">
               <h2 class=" sm:hidden text-[20px] mr-10 font-bold">DASHBOARD</h2>
               <div>
-                <p class="font-bold text-lg text-center">{user.organization.name}</p>
+                <p class="font-bold text-lg text-center">
+                  {user.organization.name}
+                </p>
                 <p class="text-sm text-center">{user.role}</p>
               </div>
               <img class="h-16" src={user.organization.logo} alt="logo" />
@@ -291,8 +311,8 @@
           {:else}
             <CardStats
               statTitle={"Sales Value"}
-              result={salesByDate.results.salesValueNet}
-              previous={salesByDate.previous.salesValueNet}
+              result={salesByDate.results.salesValueGross}
+              previous={salesByDate.previous.salesValueGross}
               {dateRange}
             />
             <CardStats
@@ -316,6 +336,11 @@
           {/if}
         {/await}
       </div>
+      <CardLineChart
+        data={performanceByDate}
+        label1={"Sales Value"}
+        label2={"Gross Profit"}
+      />
     </div>
   </div>
 </div>

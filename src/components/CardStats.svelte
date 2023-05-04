@@ -1,15 +1,4 @@
 <script lang="ts">
-  // core components
-  import {
-    CardPlaceholder,
-    ImagePlaceholder,
-    ListPlaceholder,
-    Skeleton,
-    TestimonialPlaceholder,
-    TextPlaceholder,
-    VideoPlaceholder,
-    WidgetPlaceholder,
-  } from "flowbite-svelte";
 
   export let statTitle: string | null;
   export let result: number | null;
@@ -17,7 +6,7 @@
   export let dateRange: string;
 
   let percentage: string = "";
-  
+
   if (result && previous) {
     if (result > previous) {
       percentage = (((result - previous) / previous) * 100).toFixed(2);
@@ -28,27 +17,15 @@
 
   import FaChartLine from "svelte-icons/fa/FaChartLine.svelte"; // profit
   import FaPoundSign from "svelte-icons/fa/FaPoundSign.svelte"; // sales
-  import FaChartBar from "svelte-icons/fa/FaChartBar.svelte"; //item sold order
+  import FaChartBar from "svelte-icons/fa/FaChartBar.svelte";   // item sold order
 
-  // The value must match one of these strings
-  // "up" or "down"
-  export let statArrow = "up";
-  export let statPercent = "3.48";
-  // can be any of the text color utilities
-  // from tailwindcss
-  export let statPercentColor = "text-emerald-500";
-  export let statDescripiron = "Since last month";
-  export let statIconName = "far fa-chart-bar";
-  // can be any of the background color utilities
-  // from tailwindcss
-  export let statIconColor = "bg-red-500";
 </script>
 
 <div
   class="relative flex flex-col justify-between min-w-0 w-[100%] xs:w-[90%] sm:w-[340px] md:w-[330px] h-[150px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
 >
   <div class="flex-auto p-4">
-    <div class="flex flex-wrap">
+    <div class="flex flex-wrap items-center">
       <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
         {#if result}
           <h5 class="text-blueGray-400 uppercase font-bold text-sm">
@@ -64,15 +41,15 @@
         {:else}
           <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
             <div
-              class="h-8 bg-gray-200 rounded-full dark:bg-gray-700 w-20 mt-1.5"
+              class="h-16 bg-gray-200 rounded-md dark:bg-gray-700 w-[160px] mt-1.5"
             />
           </div>
         {/if}
       </div>
-      <div class="relativepl-4 flex-initial">
+      <div class="relative pl-4 flex-initial">
         {#if statTitle === "Sales Value"}
           <div
-            class="bg-green-500 rounded-full p-3 text-xs text-white w-12 h-12"
+            class="bg-green-400 rounded-full p-3 text-xs text-white w-12 h-12"
           >
             <FaPoundSign />
           </div>
@@ -141,7 +118,7 @@
         >
           {percentage}%</span
         >
-        <span class=" ml-3">
+        <span class=" ml-2.5">
           {#if dateRange === "dtd"}
             Since yesterday
           {:else if dateRange === "wtd"}
@@ -170,7 +147,7 @@
       {:else}
         <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
           <div
-            class="h-5 bg-gray-200 rounded-full dark:bg-gray-700 w-64 mt-[20px]"
+            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[300px] "
           />
         </div>
       {/if}
