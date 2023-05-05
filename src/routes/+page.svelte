@@ -25,7 +25,9 @@
   let performanceByDate: PerformanceBydateType[];
 
   let salesPerformanceBydate: any;
-  salesPerformanceBydate;
+  let grossPerformanceByDate: any;
+  let soldItemPerformanceByDate: any;
+  let orderCountPerformanceByDate: any;
 
   let reportsByDate;
   let dateStartFormatted: string | string[];
@@ -59,6 +61,7 @@
     try {
       const resUser = await axios.get(baseUrl + "/user/self");
       user = resUser.data;
+      console.log(user);
       /*     console.log("user:", user); */
     } catch (error) {
       console.log(error);
@@ -106,9 +109,23 @@
       );
 
       performanceByDate = resPerformanceByDate.data.results;
+
       salesPerformanceBydate = performanceByDate.map(
         ({ dateName, salesValueGross }) => ({ dateName, salesValueGross })
       );
+
+      grossPerformanceByDate = performanceByDate.map(
+        ({ dateName, grossProfit }) => ({ dateName, grossProfit })
+      );
+
+      soldItemPerformanceByDate = performanceByDate.map(
+        ({ dateName, itemsSold }) => ({ dateName, itemsSold })
+      );
+      orderCountPerformanceByDate = performanceByDate.map(
+        ({ dateName, orders }) => ({ dateName, orders })
+      );
+
+      console.log(grossPerformanceByDate);
 
       loading = false;
       /*       console.log("salesByDate:", salesByDate); */
@@ -208,12 +225,11 @@
     </div>
   </nav>
   <div class="flex h-[87vh] md:h-[94vh]">
-    <nav class="  lg:w-[11%] h-full bg-black bg-opacity-[85%]" />
     <div class="pt-10 px-5 md:px-10 w-full">
       <div
         class="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between"
       >
-        <h2 class="hidden sm:block text-[30px] font-bold">DASHBOARD</h2>
+        <h2 class="xs:hidden sm:block text-[30px] font-bold">DASHBOARD</h2>
         <div class="flex flex-col-reverse sm:flex-row items-center gap-10">
           <div class="flex flex-col items-center gap-1">
             <select
@@ -282,12 +298,14 @@
             </div>
           {:then _}
             <div class="flex items-center gap-3">
-              <h2 class=" sm:hidden text-[20px] mr-10 font-bold">DASHBOARD</h2>
+              <h2 class="hidden xs:block sm:hidden text-[20px] mr-10 font-bold">
+                DASHBOARD
+              </h2>
               <div>
                 <p class="font-bold text-lg text-center">
                   {user.organization.name}
                 </p>
-                <p class="text-sm text-center">{user.role}</p>
+                <p class="text-sm text-center">{user.name}</p>
               </div>
               <img class="h-16" src={user.organization.logo} alt="logo" />
             </div>
@@ -322,6 +340,12 @@
               {dateRange}
             />
             <CardStats
+              statTitle={"Gross Profit"}
+              result={salesByDate.results.grossProfit}
+              previous={salesByDate.previous.grossProfit}
+              {dateRange}
+            />
+            <CardStats
               statTitle={"Order Count"}
               result={salesByDate.results.orders}
               previous={salesByDate.previous.orders}
@@ -333,25 +357,54 @@
               previous={salesByDate.previous.itemsSold}
               {dateRange}
             />
-            <CardStats
-              statTitle={"Gross Profit"}
-              result={salesByDate.results.grossProfit}
-              previous={salesByDate.previous.grossProfit}
-              {dateRange}
-            />
           {/if}
         {/await}
       </div>
       {#await fetchDataSummary()}
         <p />
       {:then _}
-        {#if loading}
-          <p />
-        {:else}<CardLineChart
-            data={salesPerformanceBydate}
-            label1={"Sales Value"}
-            label2={"Gross Profit"}
-          />{/if}
+        <div>
+          <h3 class="font-bold text-2xl text-center mt-10">
+            Daily Performance
+          </h3>
+          <div class="flex flex-col lg:flex-row mt-5 gap-5 lg:justify-between">
+            {#if loading}
+              <div role="status" class="space-y-2.5 animate-pulse">
+                <div
+                  class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[460px] xl:w-[600px] 2xl:w-[750px]"
+                />
+              </div>
+              <div role="status" class="space-y-2.5 animate-pulse">
+                <div
+                  class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[460px] xl:w-[600px] 2xl:w-[750px]"
+                />
+              </div>
+            {:else}
+              <CardLineChart
+                data1={salesPerformanceBydate}
+                data2={grossPerformanceByDate}
+                label1={"Sales Value"}
+                label2={"Gross Profit"}
+                color1={"#6e6ed7"}
+                color2={"#30e3cb"}
+                filter1={"salesValueGross"}
+                filter2={"grossProfit"}
+                chartId={"line-chart1"}
+              />
+              <CardLineChart
+                data1={orderCountPerformanceByDate}
+                data2={soldItemPerformanceByDate}
+                label1={"Order Count"}
+                label2={"Item Sold"}
+                color1={"#30c48d"}
+                color2={"#f27b35"}
+                filter1={"orders"}
+                filter2={"itemsSold"}
+                chartId={"line-chart2"}
+              />
+            {/if}
+          </div>
+        </div>
       {/await}
     </div>
   </div>

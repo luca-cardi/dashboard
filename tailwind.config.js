@@ -16,6 +16,7 @@ export default {
     },
     extend: {},
     screens: {
+      
       xs: { min: "400px" },
       sm: { min: "640px" },
       md: { min: "768px" },

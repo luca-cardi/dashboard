@@ -1,5 +1,4 @@
 <script lang="ts">
-
   export let statTitle: string | null;
   export let result: number | null;
   export let previous: number | null;
@@ -17,14 +16,17 @@
 
   import FaChartLine from "svelte-icons/fa/FaChartLine.svelte"; // profit
   import FaPoundSign from "svelte-icons/fa/FaPoundSign.svelte"; // sales
-  import FaChartBar from "svelte-icons/fa/FaChartBar.svelte";   // item sold order
-
+  import FaChartBar from "svelte-icons/fa/FaChartBar.svelte"; // item sold orde
+  // sales green
+  // profit blue
+  // items purple
+  //
 </script>
 
 <div
-  class="relative flex flex-col justify-between min-w-0 w-[100%] xs:w-[90%] sm:w-[340px] md:w-[330px] h-[150px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+  class="relative flex flex-col justify-between min-w-0 w-[100%] xs:w-[90%] sm:w-[340px] md:w-[330px] lg:w-[380px] h-[150px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
 >
-  <div class="flex-auto p-4">
+  <div class="flex-auto p-3">
     <div class="flex flex-wrap items-center">
       <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
         {#if result}
@@ -49,24 +51,24 @@
       <div class="relative pl-4 flex-initial">
         {#if statTitle === "Sales Value"}
           <div
-            class="bg-green-400 rounded-full p-3 text-xs text-white w-12 h-12"
+            class="bg-[#6e6ed7] rounded-full p-3 text-xs text-white w-12 h-12"
           >
             <FaPoundSign />
           </div>
         {:else if statTitle === "Order Count"}
           <div
-            class=" bg-pink-500 rounded-full p-3 text-xs text-white w-12 h-12"
+            class="  bg-[#30c48d] rounded-full p-3 text-xs text-white w-12 h-12"
           >
             <FaChartBar />
           </div>
         {:else if statTitle === "Item Sold"}
           <div
-            class="bg-orange-500 rounded-full p-3 text-xs text-white w-12 h-12"
+            class="bg-[#f27b35] rounded-full p-3 text-xs text-white w-12 h-12"
           >
             <FaChartBar />
           </div>
         {:else if statTitle === "Gross Profit"}
-          <div class="bg-red-500 rounded-full p-3 text-xs text-white w-12 h-12">
+          <div class="bg-[#30e3cb] rounded-full p-3 text-xs text-white w-12 h-12">
             <FaChartLine />
           </div>{:else}
           <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
@@ -118,7 +120,7 @@
         >
           {percentage}%</span
         >
-        <span class=" ml-2.5">
+        <span class=" ml-2.5 text-xs">
           {#if dateRange === "dtd"}
             Since yesterday
           {:else if dateRange === "wtd"}
@@ -136,7 +138,7 @@
           <h6 class="text-blueGray-400 uppercase font-bold text-[12px]">
             Previous
           </h6>
-          <span class="font-semibolzd text-sm text-blueGray-700">
+          <span class="font-semibolzd text-xs text-blueGray-700">
             {#if statTitle === "Sales Value" || statTitle === "Gross Profit"}
               £{previous.toLocaleString()}
             {:else}
@@ -147,7 +149,7 @@
       {:else}
         <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
           <div
-            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[300px] "
+            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[250px] sm:w-[280px]"
           />
         </div>
       {/if}
