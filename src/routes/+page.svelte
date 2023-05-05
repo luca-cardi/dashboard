@@ -9,11 +9,13 @@
   import FaUser from "svelte-icons/fa/FaUser.svelte";
   import CardStats from "../components/CardStats.svelte";
   import CardLineChart from "../components/CardLineChart.svelte";
-  import CardChart from "../components/CardChart.svelte";
+  import CardItemsChart from "../components/CardItemsChart.svelte";
 
   import type { SalesByDateType } from "../types/salesByDate";
   import type { UserType } from "../types/user";
   import type { PerformanceBydateType } from "../types/performanceBydate";
+  import CardMarketplacesChart from "../components/CardMarketplacesChart.svelte";
+  import CardChannelsChart from "../components/CardChannelsChart.svelte";
 
   let search: string;
   let dateRange: string = "dtd";
@@ -30,6 +32,8 @@
   let soldItemPerformanceByDate: any;
   let orderCountPerformanceByDate: any;
   let channelsPerformance: any;
+  let itemsPerformance: any;
+  let marketplacesPerformance: any;
 
   let reportsByDate;
   let dateStartFormatted: string | string[];
@@ -135,6 +139,29 @@
           dateEnd
       );
       channelsPerformance = resChannels.data;
+      console.log(channelsPerformance);
+
+      const resItems = await axios.get(
+        baseUrl +
+          "/reports/sales-overview/performance/items?start=" +
+          dateStart +
+          "&end=" +
+          dateEnd
+      );
+
+      itemsPerformance = resItems.data;
+      console.log(itemsPerformance);
+
+      const resMarketplaces = await axios.get(
+        baseUrl +
+          "/reports/sales-overview/performance/marketplaces?start=" +
+          dateStart +
+          "&end=" +
+          dateEnd
+      );
+
+      marketplacesPerformance = resMarketplaces.data;
+      console.log(marketplacesPerformance);
 
       loading = false;
       /*       console.log("salesByDate:", salesByDate); */
@@ -382,7 +409,7 @@
               color2={"#30e3cb"}
               filter1={"salesValueGross"}
               filter2={"grossProfit"}
-              chartId={"line-chart1"}
+              chartId={"sales-chart"}
             />
             <CardLineChart
               data1={orderCountPerformanceByDate}
@@ -393,13 +420,15 @@
               color2={"#f27b35"}
               filter1={"orders"}
               filter2={"itemsSold"}
-              chartId={"line-chart2"}
+              chartId={"sold-chart"}
             />
           {/if}
         </div>
       </div>
       <div class="mt-5">
-        <h3  class="font-bold text-2xl text-center mt-10">Channels Performance</h3>
+        <h3 class="font-bold text-2xl text-center mt-10">
+          Channels Performance
+        </h3>
         {#if loading}
           <div role="status" class="space-y-2.5 animate-pulse">
             <div
@@ -407,7 +436,9 @@
             />
           </div>
         {:else}
-          <CardChart data={channelsPerformance} />
+          <CardChannelsChart data={channelsPerformance} />
+          <CardItemsChart data={itemsPerformance} />
+          <CardMarketplacesChart data={marketplacesPerformance} />
         {/if}
       </div>
     </div>

@@ -5,50 +5,50 @@
   import { Chart, registerables } from "chart.js";
   Chart.register(...registerables);
 
-  export let data1: PerformanceBydateType[];
-  export let data2: PerformanceBydateType[];
-  export let label1: string;
-  export let label2: string;
-  export let color1: string;
-  export let color2: string;
-  export let filter1: string;
-  export let filter2: string;
-  export let chartId: string;
+  export let data: any;
+  console.log(data);
+  let labelsSKU = data.results.map((a) => a.itemSKU);
+  let labelsTitles = data.results.map((a) => a.itemTitle);
+  console.log(labelsSKU);
 
   // init chart
   onMount(async () => {
     var config = {
-      type: "line",
+      type: "bar",
       data: {
-        labels: data1.map((key) => key.dateName),
+        labels: labelsSKU,
+
         datasets: [
           {
-            label: label2,
+            label: "Sales",
             tension: 0.4,
-            backgroundColor: color2,
-            borderColor: color2,
+            backgroundColor: "rgb(110 110 215)",
+            borderColor: "rgb(110 110 215)",
             // @ts-ignore
-            data: data2.map((key) => key[filter2]),
+            data: data.results.map((key) => key.salesValueGross),
           },
           {
-            label: label1,
+            label: "Sold",
             tension: 0.4,
-            backgroundColor: color1,
-            borderColor: color1,
+            backgroundColor: "rgb(242 123 53 )",
+            borderColor: "rgb(242 123 53)",
             // @ts-ignore
-            data: data1.map((key) => key[filter1]),
+            data: data.results.map((key) => key.itemsSold),
           },
         ],
       },
       options: {
         responsive: true,
-     
+        indexAxis: "y",
         maintainAspectRatio: false,
         plugins: {
           legend: {
             position: "top",
           },
-      
+          title: {
+            display: true,
+            text: "Items Performance",
+          },
           hover: {
             mode: "nearest",
             intersect: true,
@@ -56,15 +56,12 @@
         },
         scales: {
           y: {
-        
           },
-          x: {
-            
-          },
+          x: {},
         },
       },
     };
-    var ctx = <HTMLCanvasElement>document.getElementById(chartId)!;
+    var ctx = <HTMLCanvasElement>document.getElementById("items-chart")!;
     // @ts-ignore
     new Chart(ctx, config);
   });
@@ -76,7 +73,7 @@
   <div class="p-5 flex-auto">
     <!-- Chart -->
     <div class="relative min-h-[350px]">
-      <canvas id={chartId} />
+      <canvas id="items-chart" />
     </div>
   </div>
 </div>
