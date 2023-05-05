@@ -14,7 +14,7 @@
   export let filter1: string;
   export let filter2: string;
   export let chartId: string;
-
+console.log(data1)
   // init chart
   onMount(async () => {
     var config = {
@@ -48,11 +48,7 @@
           legend: {
             position: "top",
           },
-          title: {
-            display: true,
-            text: "Daily Performance",
-       
-          },
+      
           hover: {
             mode: "nearest",
             intersect: true,
