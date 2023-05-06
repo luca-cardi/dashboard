@@ -10,10 +10,12 @@
   import CardStats from "../components/CardStats.svelte";
   import CardLineChart from "../components/CardLineChart.svelte";
   import CardItemsChart from "../components/CardItemsChart.svelte";
+  import CardBarItemChart from "../components/CardBarItemChart.svelte";
+  import CardItems from "../components/CardItems.svelte";
 
   import type { SalesByDateType } from "../types/salesByDate";
   import type { UserType } from "../types/user";
-  import type { PerformanceBydateType } from "../types/performanceBydate";
+  import type { PerformanceByDateType } from "../types/performanceByDate";
   import CardMarketplacesChart from "../components/CardMarketplacesChart.svelte";
   import CardChannelsChart from "../components/CardChannelsChart.svelte";
 
@@ -25,9 +27,9 @@
 
   let salesByDate: SalesByDateType;
   let user: UserType;
-  let performanceByDate: PerformanceBydateType[];
+  let performanceByDate: PerformanceByDateType[];
 
-  let salesPerformanceBydate: any;
+  let salesPerformanceByDate: any;
   let grossPerformanceByDate: any;
   let soldItemPerformanceByDate: any;
   let orderCountPerformanceByDate: any;
@@ -116,7 +118,7 @@
 
       performanceByDate = resPerformanceByDate.data.results;
 
-      salesPerformanceBydate = performanceByDate.map(
+      salesPerformanceByDate = performanceByDate.map(
         ({ dateName, salesValueGross }) => ({ dateName, salesValueGross })
       );
 
@@ -386,60 +388,59 @@
         {/if}
       </div>
       <div>
-        <h3 class="font-bold text-2xl text-center mt-10">Daily Performance</h3>
-        <div class="flex flex-col lg:flex-row mt-5 gap-5 lg:justify-between">
+        <div class="flex flex-col lg:flex-row gap-5 lg:justify-between mt-16">
+          {#if loading}
+            <div role="status" class="space-y-2.5 animate-pulse">
+              <div
+                class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[650px] xl:w-[850px] 2xl:w-[1100px]"
+              />
+            </div>
+            <div role="status" class="space-y-2.5 animate-pulse">
+              <div
+                class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[270px] xl:w-[300px] 2xl:w-[450px]"
+              />
+            </div>
+          {:else}
+            <CardLineChart
+              data1={salesPerformanceByDate}
+              data2={grossPerformanceByDate}
+            />
+            <CardBarItemChart
+              data1={orderCountPerformanceByDate}
+              data2={soldItemPerformanceByDate}
+            />
+          {/if}
+        </div>
+      </div>
+      <div>
+        {#if loading}
+          <p />
+        {:else}
+          <CardItems tableData={itemsPerformance.results} />{/if}
+      </div>
+      <div class="flex flex-col lg:flex-row mt-5 gap-5 lg:justify-between">
+        <div class="w-full">
           {#if loading}
             <div role="status" class="space-y-2.5 animate-pulse">
               <div
                 class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[460px] xl:w-[600px] 2xl:w-[750px]"
               />
             </div>
+          {:else}
+            <CardMarketplacesChart data={marketplacesPerformance} />
+          {/if}
+        </div>
+        <div class="w-full">
+          {#if loading}
             <div role="status" class="space-y-2.5 animate-pulse">
               <div
                 class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[460px] xl:w-[600px] 2xl:w-[750px]"
               />
             </div>
           {:else}
-            <CardLineChart
-              data1={salesPerformanceBydate}
-              data2={grossPerformanceByDate}
-              label1={"Sales Value"}
-              label2={"Gross Profit"}
-              color1={"#6e6ed7"}
-              color2={"#30e3cb"}
-              filter1={"salesValueGross"}
-              filter2={"grossProfit"}
-              chartId={"sales-chart"}
-            />
-            <CardLineChart
-              data1={orderCountPerformanceByDate}
-              data2={soldItemPerformanceByDate}
-              label1={"Order Count"}
-              label2={"Item Sold"}
-              color1={"#30c48d"}
-              color2={"#f27b35"}
-              filter1={"orders"}
-              filter2={"itemsSold"}
-              chartId={"sold-chart"}
-            />
+            <CardChannelsChart data={channelsPerformance} />
           {/if}
         </div>
-      </div>
-      <div class="mt-5">
-        <h3 class="font-bold text-2xl text-center mt-10">
-          Channels Performance
-        </h3>
-        {#if loading}
-          <div role="status" class="space-y-2.5 animate-pulse">
-            <div
-              class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[460px] xl:w-[600px] 2xl:w-[750px]"
-            />
-          </div>
-        {:else}
-          <CardChannelsChart data={channelsPerformance} />
-          <CardItemsChart data={itemsPerformance} />
-          <CardMarketplacesChart data={marketplacesPerformance} />
-        {/if}
       </div>
     </div>
   </div>

@@ -5,36 +5,37 @@
   import { Chart, registerables } from "chart.js";
   Chart.register(...registerables);
 
-  export let data: any;
+  export let data1: PerformanceByDateType[];
+  export let data2: PerformanceByDateType[];
 
   // init chart
   onMount(async () => {
     var config = {
       type: "bar",
       data: {
-        labels: data.results.map((key: any) => key.channelName),
+        labels: data1.map((key) => key.dateName),
         datasets: [
           {
-            label: "Sales",
+            label: "Item Sold",
             tension: 0.4,
-            backgroundColor: "rgb(110 110 215)",
-            borderColor: "rgb(110 110 215)",
+            backgroundColor: "#f27b35",
+            borderColor: "#f27b35",
             // @ts-ignore
-            data: data.results.map((key) => key.salesValueGross),
+            data: data2.map((key) => key.itemsSold),
           },
           {
-            label: "Sold",
+            label: "Order Count",
             tension: 0.4,
-            backgroundColor: "rgb(242 123 53 )",
-            borderColor: "rgb(242 123 53)",
+            backgroundColor: "#30c48d",
+            borderColor: "#30c48d",
             // @ts-ignore
-            data: data.results.map((key) => key.itemsSold),
+            data: data1.map((key) => key.orders),
           },
         ],
       },
       options: {
         responsive: true,
-        indexAxis: "y",
+
         maintainAspectRatio: false,
         plugins: {
           legend: {
@@ -42,9 +43,9 @@
           },
           title: {
             display: true,
-            text: "Channels Performance",
+            text: "Order Performance",
             align: "start",
-            color: "black",
+            color: 'black',
             font: {
               size: 20,
             },
@@ -60,19 +61,19 @@
         },
       },
     };
-    var ctx = <HTMLCanvasElement>document.getElementById("bar-chart")!;
+    var ctx = <HTMLCanvasElement>document.getElementById('sold-chart')!;
     // @ts-ignore
     new Chart(ctx, config);
   });
 </script>
 
 <div
-  class="relative flex flex-col min-w-0 break-words lg:w-[100%] mb-6 shadow-lg rounded-md bg-gray-100"
+  class="relative flex flex-col min-w-0 break-words lg:w-[30%] mb-6 shadow-lg rounded-md bg-gray-100"
 >
   <div class="p-5 flex-auto">
     <!-- Chart -->
     <div class="relative min-h-[350px]">
-      <canvas id="bar-chart" />
+      <canvas id={'sold-chart'} />
     </div>
   </div>
 </div>

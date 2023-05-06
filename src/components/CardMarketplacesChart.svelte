@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { PerformanceBydateType } from "../types/performanceBydate";
+  import type { PerformanceByDateType } from "../types/performanceBydate";
   // library that creates chart objects in page
   import { Chart, registerables } from "chart.js";
+
   Chart.register(...registerables);
 
   export let data: any;
@@ -45,10 +46,16 @@
           title: {
             display: true,
             text: "Marketplaces Performance",
+            align: 'start',
+                   color: 'black',
+            font: {
+              size: 20,
+            },
           },
           hover: {
             mode: "nearest",
             intersect: true,
+            
           },
         },
         scales: {
@@ -65,7 +72,7 @@
 </script>
 
 <div
-  class="relative flex flex-col min-w-0 break-words lg:w-[50%] mb-6 shadow-lg rounded-md bg-gray-100"
+  class="relative flex flex-col min-w-0 break-words lg:w-[100%] mb-6 shadow-lg rounded-md bg-gray-100"
 >
   <div class="p-5 flex-auto">
     <!-- Chart -->

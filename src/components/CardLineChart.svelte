@@ -1,19 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { PerformanceBydateType } from "../types/performanceBydate";
+  import type { PerformanceByDateType } from "../types/performanceBydate";
   // library that creates chart objects in page
   import { Chart, registerables } from "chart.js";
   Chart.register(...registerables);
 
-  export let data1: PerformanceBydateType[];
-  export let data2: PerformanceBydateType[];
-  export let label1: string;
-  export let label2: string;
-  export let color1: string;
-  export let color2: string;
-  export let filter1: string;
-  export let filter2: string;
-  export let chartId: string;
+  export let data1: PerformanceByDateType[];
+  export let data2: PerformanceByDateType[];
 
   // init chart
   onMount(async () => {
@@ -23,60 +16,64 @@
         labels: data1.map((key) => key.dateName),
         datasets: [
           {
-            label: label2,
+            label: "Gross Profit",
             tension: 0.4,
-            backgroundColor: color2,
-            borderColor: color2,
+            backgroundColor: "#30e3cb",
+            borderColor: "#30e3cb",
             // @ts-ignore
-            data: data2.map((key) => key[filter2]),
+            data: data2.map((key) => key.grossProfit),
           },
           {
-            label: label1,
+            label: "Sales Value",
             tension: 0.4,
-            backgroundColor: color1,
-            borderColor: color1,
+            backgroundColor: "#6e6ed7",
+            borderColor: "#6e6ed7",
             // @ts-ignore
-            data: data1.map((key) => key[filter1]),
+            data: data1.map((key) => key.salesValueGross),
           },
         ],
       },
       options: {
         responsive: true,
-     
         maintainAspectRatio: false,
         plugins: {
           legend: {
             position: "top",
           },
-      
+          title: {
+            display: true,
+            text: "Sales Performance",
+            align: "start",
+            color: "black",
+            font: {
+              size: 20,
+            },
+          },
+
           hover: {
             mode: "nearest",
             intersect: true,
           },
         },
         scales: {
-          y: {
-        
-          },
-          x: {
-            
-          },
+          y: {},
+          x: {},
         },
       },
     };
-    var ctx = <HTMLCanvasElement>document.getElementById(chartId)!;
+    var ctx = <HTMLCanvasElement>document.getElementById("sales-chart")!;
     // @ts-ignore
     new Chart(ctx, config);
   });
 </script>
 
 <div
-  class="relative flex flex-col min-w-0 break-words lg:w-[50%] mb-6 shadow-lg rounded-md bg-gray-100"
+  class="relative flex flex-col min-w-0 break-words lg:w-[70%] mb-6 shadow-lg rounded-md bg-gray-100"
 >
   <div class="p-5 flex-auto">
     <!-- Chart -->
     <div class="relative min-h-[350px]">
-      <canvas id={chartId} />
+      <canvas id={"sales-chart"} />
     </div>
   </div>
 </div>

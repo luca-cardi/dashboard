@@ -1,4 +1,4 @@
-export type PerformanceBydateType = {
+export type PerformanceByDateType = {
     dateName: string;
     grossProfit: number;
     grossProfitMargin: number;
