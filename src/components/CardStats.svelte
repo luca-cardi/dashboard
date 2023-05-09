@@ -14,17 +14,13 @@
     }
   }
 
-  import FaChartLine from "svelte-icons/fa/FaChartLine.svelte"; // profit
-  import FaPoundSign from "svelte-icons/fa/FaPoundSign.svelte"; // sales
-  import FaChartBar from "svelte-icons/fa/FaChartBar.svelte"; // item sold orde
-  // sales green
-  // profit blue
-  // items purple
-  //
+  import FaChartLine from "svelte-icons/fa/FaChartLine.svelte";
+  import FaPoundSign from "svelte-icons/fa/FaPoundSign.svelte";
+  import FaChartBar from "svelte-icons/fa/FaChartBar.svelte";
 </script>
 
 <div
-  class="relative flex flex-col justify-between min-w-0 w-[100%] xs:w-[90%] sm:w-[340px] md:w-[330px] lg:w-[380px] h-[150px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+  class="relative flex flex-col justify-between min-w-0 w-[100%] sm:w-[340px] md:w-[340px] lg:w-[380px] h-[150px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
 >
   <div class="flex-auto p-3">
     <div class="flex flex-wrap items-center">
@@ -34,11 +30,7 @@
             {statTitle}
           </h5>
           <span class="font-semibold text-2xl text-blueGray-700">
-            {#if statTitle === "Sales Value" || statTitle === "Gross Profit"}
-              £ {result.toLocaleString()}
-            {:else}
-              {result}
-            {/if}
+            £ {result.toLocaleString()}
           </span>
         {:else}
           <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
@@ -55,20 +47,22 @@
           >
             <FaPoundSign />
           </div>
-        {:else if statTitle === "Order Count"}
+        {:else if statTitle === "Orders Count"}
           <div
             class="  bg-[#30c48d] rounded-full p-3 text-xs text-white w-12 h-12"
           >
             <FaChartBar />
           </div>
-        {:else if statTitle === "Item Sold"}
+        {:else if statTitle === "Items Sold"}
           <div
             class="bg-[#f27b35] rounded-full p-3 text-xs text-white w-12 h-12"
           >
             <FaChartBar />
           </div>
         {:else if statTitle === "Gross Profit"}
-          <div class="bg-[#30e3cb] rounded-full p-3 text-xs text-white w-12 h-12">
+          <div
+            class="bg-[#30e3cb] rounded-full p-3 text-xs text-white w-12 h-12"
+          >
             <FaChartLine />
           </div>{:else}
           <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
@@ -78,7 +72,7 @@
           </div>{/if}
       </div>
     </div>
-    <div class="flex text-sm text-blueGray-400 mt-8 items-center">
+    <div class="flex text-sm lg:text-base text-blueGray-400 mt-8 items-center">
       {#if result && previous}
         <span class=" {result}">
           {#if result / previous > 1}
@@ -120,30 +114,27 @@
         >
           {percentage}%</span
         >
-        <span class=" ml-2.5 text-xs">
+        <span class=" ml-1.5 xs:ml-2.5 text-[10px] xs:text-[13px]  ">
           {#if dateRange === "dtd"}
-            Since yesterday
+            Compared to yesterday
           {:else if dateRange === "wtd"}
-            Since last week
+            Compared to last week
           {:else if dateRange === "mtd"}
-            Since last month
+            Compared to last month
           {:else if dateRange === "qtd"}
-            Since last quarter
+            Compared to last quarter
           {:else if dateRange === "ytd"}
-            Since last year
+            Compared to last year
           {/if}</span
         >
-
         <div class="relative w-auto pl-4 flex-initial ml-auto text-center">
-          <h6 class="text-blueGray-400 uppercase font-bold text-[12px]">
+          <h6
+            class="text-blueGray-400 uppercase font-bold text-[10px] xs:text-sm"
+          >
             Previous
           </h6>
-          <span class="font-semibolzd text-xs text-blueGray-700">
-            {#if statTitle === "Sales Value" || statTitle === "Gross Profit"}
-              £{previous.toLocaleString()}
-            {:else}
-              {previous}
-            {/if}
+          <span class="font-semibolzd text-xs lg:text-base text-blueGray-700">
+            £{previous.toLocaleString()}
           </span>
         </div>
       {:else}

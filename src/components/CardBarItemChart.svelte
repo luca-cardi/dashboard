@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { PerformanceByDateType } from "../types/performanceBydate";
+  import type { PerformanceByDateType } from "../types/performanceByDate";
   // library that creates chart objects in page
   import { Chart, registerables } from "chart.js";
   Chart.register(...registerables);
@@ -35,19 +35,23 @@
       },
       options: {
         responsive: true,
-
         maintainAspectRatio: false,
+
         plugins: {
           legend: {
             position: "top",
+            labels: {
+              usePointStyle: true,
+            },
           },
           title: {
             display: true,
             text: "Order Performance",
             align: "start",
-            color: 'black',
+            color: "black",
             font: {
               size: 20,
+              family: "'Open Sans', sans-serif",
             },
           },
           hover: {
@@ -55,13 +59,9 @@
             intersect: true,
           },
         },
-        scales: {
-          y: {},
-          x: {},
-        },
       },
     };
-    var ctx = <HTMLCanvasElement>document.getElementById('sold-chart')!;
+    var ctx = <HTMLCanvasElement>document.getElementById("sold-chart")!;
     // @ts-ignore
     new Chart(ctx, config);
   });
@@ -73,7 +73,7 @@
   <div class="p-5 flex-auto">
     <!-- Chart -->
     <div class="relative min-h-[350px]">
-      <canvas id={'sold-chart'} />
+      <canvas id={"sold-chart"} />
     </div>
   </div>
 </div>

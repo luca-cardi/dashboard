@@ -1,76 +1,62 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { Button, Chevron, Dropdown, DropdownItem } from "flowbite-svelte";
-
-  import { onMount } from "svelte";
-
   import axios from "axios";
-  // @ts-ignore
-  import FaUser from "svelte-icons/fa/FaUser.svelte";
+
+  import CardItems from "../components/CardItems.svelte";
   import CardStats from "../components/CardStats.svelte";
   import CardLineChart from "../components/CardLineChart.svelte";
-  import CardItemsChart from "../components/CardItemsChart.svelte";
   import CardBarItemChart from "../components/CardBarItemChart.svelte";
-  import CardItems from "../components/CardItems.svelte";
+  import CardBarVerticalChart from "../components/CardBarVerticalChart.svelte";
 
-  import type { SalesByDateType } from "../types/salesByDate";
+  //types
   import type { UserType } from "../types/user";
+  import type { SalesByDateType } from "../types/salesByDate";
+  import type { ItemsPerfomanceType } from "../types/itemsPerformance";
   import type { PerformanceByDateType } from "../types/performanceByDate";
-  import CardMarketplacesChart from "../components/CardMarketplacesChart.svelte";
-  import CardChannelsChart from "../components/CardChannelsChart.svelte";
+  import type { ChannelsPerformanceType } from "../types/channelsPerformance";
+  import type { MarketplacesPerformanceType } from "../types/markeplacesPerfomance";
 
-  let search: string;
   let dateRange: string = "dtd";
   const baseUrl = "https://api-prod.tradepeg.com";
 
   $: dateRange, fetchDataSummary();
 
-  let salesByDate: SalesByDateType;
   let user: UserType;
+  let salesByDate: SalesByDateType;
+  let itemsPerformance: ItemsPerfomanceType[];
   let performanceByDate: PerformanceByDateType[];
+  let channelsPerformance: ChannelsPerformanceType[];
+  let salesPerformanceByDate: PerformanceByDateType[];
+  let grossPerformanceByDate: PerformanceByDateType[];
+  let soldItemPerformanceByDate: PerformanceByDateType[];
+  let orderCountPerformanceByDate: PerformanceByDateType[];
+  let marketplacesPerformance: MarketplacesPerformanceType[];
 
-  let salesPerformanceByDate: any;
-  let grossPerformanceByDate: any;
-  let soldItemPerformanceByDate: any;
-  let orderCountPerformanceByDate: any;
-  let channelsPerformance: any;
-  let itemsPerformance: any;
-  let marketplacesPerformance: any;
-
-  let reportsByDate;
-  let dateStartFormatted: string | string[];
-  let dateEndFormatted: string | string[];
-  let dateStart: string;
   let dateEnd: string;
+  let dateStart: string;
+  let dateEndFormatted: string | string[];
+  let dateStartFormatted: string | string[];
 
   let loading: boolean = false;
+  let loadingChartSalesChart: boolean = false;
+  let loadingItems: boolean = false;
+  let loadingMarketChannels: boolean = false;
 
-  /*  onMount(async () => {
-       const urlParams = new URLSearchParams(window.location.search);
-    const isBeta = urlParams.has('apiKey');
- 
-    const API_KEY = $page.url.searchParams.get("apiKey");
-
-    // hardcoded at the moment
-    axios.defaults.headers.common["Authorization"] =
-      "dG9rZW58eW5jOjI0OjNYMGdBZjlkWnBrSUJjUGJITHd4UktZak9scVZKVUc3NWhteXo0NnJlTU5pQ3NGdGF1MTJURVdvOHZuU1FEVmhlUDZ5QkdRT21jWDhaYnVMa0hSUzlLaUNXTTVucmdvRVlmbHQ0cElOYVQydmRKRlVqM3d6MXF4MERzN0F6UVVhZjZBdG5ZcHhpTTRxRzUzdks4ZUhtMVA5aHNSZGMwRlpCQ1hrREpOdVdvMmpUVmd3bE83eUlTRUxicmhkZ0ZwVTlsTmtNRXRYVHhXMEIyTGVmNEhWQ3FZWlNqS25zeVFpUGJvRHZSSnJ1T3dhN2N6OG1BNTZJM0cxWTFUZjBTOWs=";
-
-    fetchDataSummary();
-  })
- */
   const getApiKey = async () => {
     const API_KEY = $page.url.searchParams.get("apiKey");
     // hardcoded at the moment
-    axios.defaults.headers.common["Authorization"] =
-      "dG9rZW58eW5jOjI0OjNYMGdBZjlkWnBrSUJjUGJITHd4UktZak9scVZKVUc3NWhteXo0NnJlTU5pQ3NGdGF1MTJURVdvOHZuU1FEVmhlUDZ5QkdRT21jWDhaYnVMa0hSUzlLaUNXTTVucmdvRVlmbHQ0cElOYVQydmRKRlVqM3d6MXF4MERzN0F6UVVhZjZBdG5ZcHhpTTRxRzUzdks4ZUhtMVA5aHNSZGMwRlpCQ1hrREpOdVdvMmpUVmd3bE83eUlTRUxicmhkZ0ZwVTlsTmtNRXRYVHhXMEIyTGVmNEhWQ3FZWlNqS25zeVFpUGJvRHZSSnJ1T3dhN2N6OG1BNTZJM0cxWTFUZjBTOWs=";
+    axios.defaults.headers.common["Authorization"] = API_KEY
+      
   };
+
+  //"dG9rZW58eW5jOjI0OjNYMGdBZjlkWnBrSUJjUGJITHd4UktZak9scVZKVUc3NWhteXo0NnJlTU5pQ3NGdGF1MTJURVdvOHZuU1FEVmhlUDZ5QkdRT21jWDhaYnVMa0hSUzlLaUNXTTVucmdvRVlmbHQ0cElOYVQydmRKRlVqM3d6MXF4MERzN0F6UVVhZjZBdG5ZcHhpTTRxRzUzdks4ZUhtMVA5aHNSZGMwRlpCQ1hrREpOdVdvMmpUVmd3bE83eUlTRUxicmhkZ0ZwVTlsTmtNRXRYVHhXMEIyTGVmNEhWQ3FZWlNqS25zeVFpUGJvRHZSSnJ1T3dhN2N6OG1BNTZJM0cxWTFUZjBTOWs=";
 
   const fetchUser = async () => {
     try {
       const resUser = await axios.get(baseUrl + "/user/self");
       user = resUser.data;
-      /*       console.log(user); */
-      /*     console.log("user:", user); */
+      /* console.log(user); */
+     console.log("user:", user);
     } catch (error) {
       console.log(error);
     }
@@ -78,7 +64,11 @@
 
   const fetchDataSummary = async () => {
     try {
+      loadingChartSalesChart = true;
+      loadingItems = true;
+      loadingMarketChannels = true;
       loading = true;
+
       if (!axios.defaults.headers.common["Authorization"]) {
         await getApiKey();
       }
@@ -88,11 +78,11 @@
       );
 
       salesByDate = resSalesByDate.data;
-
+      loading = false;
       dateStart = salesByDate.dateRanges.range1.start;
       dateEnd = salesByDate.dateRanges.range1.end;
 
-      //format data for ui
+      // format data for ui
       dateStartFormatted = salesByDate.dateRanges.range1.start.split("-");
       dateStartFormatted =
         dateStartFormatted[2] +
@@ -132,16 +122,7 @@
       orderCountPerformanceByDate = performanceByDate.map(
         ({ dateName, orders }) => ({ dateName, orders })
       );
-
-      const resChannels = await axios.get(
-        baseUrl +
-          "/reports/sales-overview/performance/channels?start=" +
-          dateStart +
-          "&end=" +
-          dateEnd
-      );
-      channelsPerformance = resChannels.data;
-      console.log(channelsPerformance);
+      loadingChartSalesChart = false;
 
       const resItems = await axios.get(
         baseUrl +
@@ -151,9 +132,21 @@
           dateEnd
       );
 
-      itemsPerformance = resItems.data;
-      console.log(itemsPerformance);
+      itemsPerformance = resItems.data.results;
+      loadingItems = false;
 
+      /*  console.log("items", itemsPerformance); */
+      const resChannels = await axios.get(
+        baseUrl +
+          "/reports/sales-overview/performance/channels?start=" +
+          dateStart +
+          "&end=" +
+          dateEnd
+      );
+
+      channelsPerformance = resChannels.data.results;
+
+      /*  console.log("channels", channelsPerformance); */
       const resMarketplaces = await axios.get(
         baseUrl +
           "/reports/sales-overview/performance/marketplaces?start=" +
@@ -162,11 +155,10 @@
           dateEnd
       );
 
-      marketplacesPerformance = resMarketplaces.data;
-      console.log(marketplacesPerformance);
-
-      loading = false;
-      /*       console.log("salesByDate:", salesByDate); */
+      marketplacesPerformance = resMarketplaces.data.results;
+      /*  console.log("marketplaces", marketplacesPerformance); */
+      /*  console.log("salesByDate:", salesByDate); */
+      loadingMarketChannels = false;
     } catch (error) {
       console.log(error);
     }
@@ -174,96 +166,8 @@
 </script>
 
 <div class="min-h-screen font-sans">
-  <nav
-    class="flex flex-col md:flex-row h-[13vh] md:h-[6vh] items-center justify-between px-1 py-3 bg-black bg-opacity-[85%]"
-  >
-    <div class="flex gap-5 items-center">
-      <a class="  text-white text-3xl pl-3" href="/">TradePeg</a>
-      <button
-        class=" hidden md:block btn btn-link btn-sm text-white h-5 w-5"
-        id="sidebarToggleTablet"
-        ><svg
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          viewBox="0 0 14 24"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-          class="h-10 -mt-2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
-        </svg>
-      </button>
-    </div>
-    <div class="flex gap-2 items-center w-[98%]">
-      <button
-        class="md:hidden btn btn-link btn-sm text-white h-5 w-5"
-        id="sidebarTogglePhone"
-        ><svg
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          viewBox="0 0 14 24"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-          class="h-10 -mt-2.5"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
-        </svg>
-      </button>
-      <form
-        action=""
-        class="relative ml-auto group min-w-180 sm:min-w-200 self-end"
-      >
-        <input
-          bind:value={search}
-          type="search"
-          class="transition-all duration-1000 group-focus-within:w-[160px] xs:group-focus-within:w-[200px] focus:pl-10
-           focus:ring-white focus:border-white focus-focus-within:cursor-text focus:white cursor-pointer relative z-10
-           h-10 w-10 rounded-md border bg-transparent text-white outline-none search-cancel:appearance-none"
-        />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="absolute inset-y-0 h-10 w-10 border-r border-transparent text-white py-1.5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
-      </form>
-      <!-- Navbar-->
-      <Button
-        class="!p-1.5 hover:bg-transparent bg-transparent focus:border-0 focus:!ring-0 focus:bg-transparent"
-      >
-        <Chevron>
-          <div class="h-6">
-            <FaUser />
-          </div>
-        </Chevron>
-      </Button>
-      <Dropdown class="w-[120px]">
-        <DropdownItem>Settings</DropdownItem>
-        <DropdownItem>Activity Log</DropdownItem>
-        <DropdownItem>Logout</DropdownItem>
-      </Dropdown>
-    </div>
-  </nav>
   <div class="flex h-[87vh] md:h-[94vh]">
-    <div class="pt-10 px-5 md:px-10 w-full">
+    <div class="pt-10 px-2 xs:px-5 md:px-10 w-full">
       <div
         class="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between"
       >
@@ -272,6 +176,7 @@
           <div class="flex flex-col items-center gap-1">
             <select
               bind:value={dateRange}
+              disabled={loading}
               id="countries"
               class="w-[170px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
@@ -284,54 +189,43 @@
             {#await fetchDataSummary()}
               <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
                 <div
-                  class="h-[30px] bg-gray-200 rounded-full dark:bg-gray-700 w-[73px]"
+                  class="h-[30px] bg-gray-200 rounded-full dark:bg-gray-700 w-[160px]"
                 />
               </div>
             {:then _}
-              <div class="flex items-center justify-between w-[170px]">
+              <div class="flex items-center justify-between w-[160px]">
                 {#if loading}
                   <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
                     <div
-                      class="h-[30px] bg-gray-200 rounded-md dark:bg-gray-700 w-[73px]"
+                      class="h-[30px] bg-gray-200 rounded-md dark:bg-gray-700 w-[160px]"
                     />
                   </div>{:else}
-                  <p
-                    class=" bg-gray-50 border-gray-300 border-[1px] p-[2px] rounded-md"
-                  >
+                  <p>
                     {dateStartFormatted}
-                  </p>{/if}
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-4 h-4 text-gray-600"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-                  />
-                </svg>
-                {#if loading}
-                  <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
-                    <div
-                      class="h-[30px] bg-gray-200 rounded-md dark:bg-gray-700 w-[73px]"
-                    />
-                  </div>
-                {:else}
-                  <p
-                    class=" bg-gray-50 border-gray-300 border-[1px] p-[2px] rounded-md"
+                  </p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-4 h-4 text-gray-600"
                   >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
+                    />
+                  </svg>
+                  <p>
                     {dateEndFormatted}
-                  </p>{/if}
+                  </p>
+                {/if}
               </div>
             {/await}
           </div>
           {#await fetchUser()}
-            <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+            <div role="status" class=" animate-pulse max-w-lg">
               <div class="h-3 bg-gray-200 rounded-full dark:bg-gray-700 w-30" />
             </div>
           {:then _}
@@ -350,7 +244,9 @@
           {/await}
         </div>
       </div>
-      <div class="flex gap-3 flex-wrap justify-center sm:justify-between mt-16">
+      <div
+        class="flex gap-2 flex-wrap xl:flex-nowrap justify-center sm:justify-between mt-16"
+      >
         {#if loading}
           {#each { length: 4 } as _, i}
             <CardStats
@@ -374,13 +270,13 @@
             {dateRange}
           />
           <CardStats
-            statTitle={"Order Count"}
+            statTitle={"Orders Count"}
             result={salesByDate.results.orders}
             previous={salesByDate.previous.orders}
             {dateRange}
           />
           <CardStats
-            statTitle={"Item Sold"}
+            statTitle={"Items Sold"}
             result={salesByDate.results.itemsSold}
             previous={salesByDate.previous.itemsSold}
             {dateRange}
@@ -388,16 +284,18 @@
         {/if}
       </div>
       <div>
-        <div class="flex flex-col lg:flex-row gap-5 lg:justify-between mt-16">
-          {#if loading}
-            <div role="status" class="space-y-2.5 animate-pulse">
+        <div
+          class="flex flex-col lg:flex-row gap-12 lg:gap-5 justify-center lg:justify-between mt-12"
+        >
+          {#if loadingChartSalesChart}
+            <div role="status" class=" animate-pulse">
               <div
-                class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[650px] xl:w-[850px] 2xl:w-[1100px]"
+                class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[65.5vw]"
               />
             </div>
-            <div role="status" class="space-y-2.5 animate-pulse">
+            <div role="status" class=" animate-pulse">
               <div
-                class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[270px] xl:w-[300px] 2xl:w-[450px]"
+                class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[27.5vw]"
               />
             </div>
           {:else}
@@ -412,35 +310,43 @@
           {/if}
         </div>
       </div>
-      <div>
-        {#if loading}
-          <p />
+      <div class="flex mt-12">
+        {#if loadingItems}
+          <div role="status" class=" animate-pulse">
+            <div
+              class="h-[450px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[94.5vw]"
+            />
+          </div>
         {:else}
-          <CardItems tableData={itemsPerformance.results} />{/if}
+          <CardItems tableData={itemsPerformance} />{/if}
       </div>
-      <div class="flex flex-col lg:flex-row mt-5 gap-5 lg:justify-between">
-        <div class="w-full">
-          {#if loading}
-            <div role="status" class="space-y-2.5 animate-pulse">
+      <div
+        class="flex flex-col lg:flex-row my-12 gap-5 justify-center lg:justify-between"
+      >
+          {#if loadingMarketChannels}
+            <div role="status" class=" animate-pulse">
               <div
-                class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[460px] xl:w-[600px] 2xl:w-[750px]"
+                class="h-[300px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[46.7vw]"
+              />
+            </div>
+            <div role="status" class=" animate-pulse">
+              <div
+                class="h-[300px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[46.7vw]"
               />
             </div>
           {:else}
-            <CardMarketplacesChart data={marketplacesPerformance} />
+            <CardBarVerticalChart
+              data={marketplacesPerformance}
+              title={"Top Marketplaces Perfomance"}
+              filter={"marketplaceName"}
+            />
+            <CardBarVerticalChart
+              data={channelsPerformance}
+              title={"Top Channels Perfomance"}
+              filter={"channelName"}
+            />
           {/if}
-        </div>
-        <div class="w-full">
-          {#if loading}
-            <div role="status" class="space-y-2.5 animate-pulse">
-              <div
-                class="h-[400px] bg-gray-200 rounded-md dark:bg-gray-700 w-[280px] xs:w-[370px] md:w-[700px] lg:w-[460px] xl:w-[600px] 2xl:w-[750px]"
-              />
-            </div>
-          {:else}
-            <CardChannelsChart data={channelsPerformance} />
-          {/if}
-        </div>
+     
       </div>
     </div>
   </div>

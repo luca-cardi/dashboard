@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { PerformanceByDateType } from "../types/performanceBydate";
+  import type { PerformanceByDateType } from "../types/performanceByDate";
   // library that creates chart objects in page
   import { Chart, registerables } from "chart.js";
   Chart.register(...registerables);
@@ -20,7 +20,6 @@
             tension: 0.4,
             backgroundColor: "#30e3cb",
             borderColor: "#30e3cb",
-            // @ts-ignore
             data: data2.map((key) => key.grossProfit),
           },
           {
@@ -28,7 +27,6 @@
             tension: 0.4,
             backgroundColor: "#6e6ed7",
             borderColor: "#6e6ed7",
-            // @ts-ignore
             data: data1.map((key) => key.salesValueGross),
           },
         ],
@@ -39,6 +37,9 @@
         plugins: {
           legend: {
             position: "top",
+            labels: {
+              usePointStyle: true,
+            },
           },
           title: {
             display: true,
@@ -47,17 +48,14 @@
             color: "black",
             font: {
               size: 20,
+              family: "'Open Sans', sans-serif"
             },
           },
-
+          
           hover: {
             mode: "nearest",
             intersect: true,
           },
-        },
-        scales: {
-          y: {},
-          x: {},
         },
       },
     };

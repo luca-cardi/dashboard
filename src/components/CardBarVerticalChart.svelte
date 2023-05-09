@@ -1,34 +1,45 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { PerformanceByDateType } from "../types/performanceBydate";
-  // library that creates chart objects in page
+  import type { MarketplacesPerformanceType } from "../types/markeplacesPerfomance";
+
   import { Chart, registerables } from "chart.js";
+
   Chart.register(...registerables);
 
   export let data: any;
-
+  export let title: string
+  export let filter: string
+console.log(data)
   // init chart
   onMount(async () => {
     var config = {
       type: "bar",
       data: {
-        labels: data.results.map((key: any) => key.channelName),
+        labels: data.map(
+          (key:  any) => key[filter]
+        ),
         datasets: [
           {
-            label: "Sales",
+            label: "Sales Value",
             tension: 0.4,
-            backgroundColor: "rgb(110 110 215)",
-            borderColor: "rgb(110 110 215)",
-            // @ts-ignore
-            data: data.results.map((key) => key.salesValueGross),
+            backgroundColor: "#6e6ed7",
+            borderColor: "#6e6ed7",
+            data: data.map((key : any) => key.salesValueGross),
           },
           {
-            label: "Sold",
+            label: "Items Sold",
             tension: 0.4,
-            backgroundColor: "rgb(242 123 53 )",
-            borderColor: "rgb(242 123 53)",
-            // @ts-ignore
-            data: data.results.map((key) => key.itemsSold),
+            backgroundColor: "#f27b35",
+            borderColor: "#f27b35",
+            data: data.map((key : any) => key.itemsSold),
+          },
+          {
+            label: "Order Count",
+            tension: 0.4,
+            backgroundColor: "#30c48d",
+            borderColor: "#30c48d",
+            data: data.map((key : any) => key.orders),
+            hidden: true,
           },
         ],
       },
@@ -39,14 +50,18 @@
         plugins: {
           legend: {
             position: "top",
+            labels: {
+              usePointStyle: true,
+            },
           },
           title: {
             display: true,
-            text: "Channels Performance",
+            text: title,
             align: "start",
             color: "black",
             font: {
               size: 20,
+              family: "'Open Sans', sans-serif"
             },
           },
           hover: {
@@ -54,13 +69,9 @@
             intersect: true,
           },
         },
-        scales: {
-          y: {},
-          x: {},
-        },
       },
     };
-    var ctx = <HTMLCanvasElement>document.getElementById("bar-chart")!;
+    var ctx = <HTMLCanvasElement>document.getElementById(filter)!;
     // @ts-ignore
     new Chart(ctx, config);
   });
@@ -72,7 +83,7 @@
   <div class="p-5 flex-auto">
     <!-- Chart -->
     <div class="relative min-h-[350px]">
-      <canvas id="bar-chart" />
+      <canvas id={filter} />
     </div>
   </div>
 </div>

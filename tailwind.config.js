@@ -8,15 +8,9 @@ export default {
     "./node_modules/flowbite/**/*.{html,js,svelte,ts}",
   ],
   theme: {
-    fontFamily: {
-
-      'lato': ["Lato", "sans-serif"],
-      'mono': ["Open Sans", "sans-serif"],     
-       'robo': ["Roboto", "sans-serif"],
-    },
+   
     extend: {},
     screens: {
-      
       xs: { min: "400px" },
       sm: { min: "640px" },
       md: { min: "768px" },
@@ -24,6 +18,11 @@ export default {
       xl: { min: "1280px" },
       "2xl": { min: "1536px" },
     },
+  },
+  variants: {
+    extend: {
+      backgroundColor: ['even'],
+    }
   },
   plugins: [
     require("flowbite/plugin"),
