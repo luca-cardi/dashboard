@@ -1,27 +1,27 @@
 <script lang="ts">
-  import type { ItemsPerfomanceType } from "../types/itemsPerformance";
-  export let tableData: ItemsPerfomanceType[];
+  import type { ItemsPerformanceType } from "../types/itemsPerformance";
+  export let tableData: ItemsPerformanceType[];
   import FaMedal from "svelte-icons/fa/FaMedal.svelte";
 
   let filterValue: string = "salesValueGross";
   const filter = () => {
     if (filterValue === "itemTitle" || filterValue == "itemSKU") {
       tableData = tableData.sort((a, b) =>
-        a[filterValue as keyof ItemsPerfomanceType] >
-        b[filterValue as keyof ItemsPerfomanceType]
+        a[filterValue as keyof ItemsPerformanceType] >
+        b[filterValue as keyof ItemsPerformanceType]
           ? 1
-          : b[filterValue as keyof ItemsPerfomanceType] >
-            a[filterValue as keyof ItemsPerfomanceType]
+          : b[filterValue as keyof ItemsPerformanceType] >
+            a[filterValue as keyof ItemsPerformanceType]
           ? -1
           : 0
       );
     } else {
       tableData = tableData.sort((a, b) =>
-        a[filterValue as keyof ItemsPerfomanceType] <
-        b[filterValue as keyof ItemsPerfomanceType]
+        a[filterValue as keyof ItemsPerformanceType] <
+        b[filterValue as keyof ItemsPerformanceType]
           ? 1
-          : b[filterValue as keyof ItemsPerfomanceType] <
-            a[filterValue as keyof ItemsPerfomanceType]
+          : b[filterValue as keyof ItemsPerformanceType] <
+            a[filterValue as keyof ItemsPerformanceType]
           ? -1
           : 0
       );
@@ -100,7 +100,7 @@
             </div>
           </td>
           <td class=" pr-4 text-right"
-            >£{Math.round(data.salesValueGross).toLocaleString()}
+            >£ {Math.round(data.salesValueGross).toLocaleString()}
           </td>
           <td class=" pr-2 text-right">{data.itemsSold.toLocaleString()}</td>
         </tr>

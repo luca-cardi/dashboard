@@ -1,8 +1,8 @@
 <script lang="ts">
-  export let statTitle: string | null;
+  export let dateRange: string;
   export let result: number | null;
   export let previous: number | null;
-  export let dateRange: string;
+  export let statTitle: string | null;
 
   let percentage: string = "";
 
@@ -30,7 +30,7 @@
             {statTitle}
           </h5>
           <span class="font-semibold text-2xl text-blueGray-700">
-            £ {result.toLocaleString()}
+            £ {Math.round(result).toLocaleString()}
           </span>
         {:else}
           <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
@@ -114,7 +114,7 @@
         >
           {percentage}%</span
         >
-        <span class=" ml-1.5 xs:ml-2.5 text-[10px] xs:text-[13px]  ">
+        <span class=" ml-1.5 xs:ml-2.5 text-[10px] xs:text-[13px]">
           {#if dateRange === "dtd"}
             Compared to yesterday
           {:else if dateRange === "wtd"}
@@ -127,14 +127,14 @@
             Compared to last year
           {/if}</span
         >
-        <div class="relative w-auto pl-4 flex-initial ml-auto text-center">
+        <div class=" w-auto pl-4  ml-auto text-center">
           <h6
-            class="text-blueGray-400 uppercase font-bold text-[10px] xs:text-sm"
+            class="text-blueGray-400 uppercase font-semibold  text-[10px] xs:text-sm"
           >
             Previous
           </h6>
-          <span class="font-semibolzd text-xs lg:text-base text-blueGray-700">
-            £{previous.toLocaleString()}
+          <span class="font-semibold text-xs lg:text-base text-blueGray-700">
+            £ {Math.round(previous).toLocaleString()}
           </span>
         </div>
       {:else}

@@ -1,4 +1,4 @@
-export type ItemsPerfomanceType = {
+export type ItemsPerformanceType = {
     itemSKU: string;
     itemTitle: string;
     grossProfit: number;

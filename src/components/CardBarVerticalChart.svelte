@@ -1,15 +1,14 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { MarketplacesPerformanceType } from "../types/markeplacesPerfomance";
-
+  import type { BarVerticalChartType } from "../types/barVerticalChart";
   import { Chart, registerables } from "chart.js";
 
   Chart.register(...registerables);
 
-  export let data: any;
+  export let data: BarVerticalChartType[];
   export let title: string
   export let filter: string
-console.log(data)
+
   // init chart
   onMount(async () => {
     var config = {

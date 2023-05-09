@@ -1,5 +1,6 @@
-export type ChannelsPerformanceType = {
-  channelName: string;
+export type BarVerticalChartType = {
+  channelName?: string;
+  marketplaceName?: string;
   grossProfit: number;
   grossProfitMargin: number;
   grossProfitMarkup: number;

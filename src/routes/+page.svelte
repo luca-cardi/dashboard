@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { page } from "$app/stores";
   import axios from "axios";
+  import { page } from "$app/stores";
+  import { Alert } from "flowbite-svelte";
 
   import CardItems from "../components/CardItems.svelte";
   import CardStats from "../components/CardStats.svelte";
@@ -11,52 +12,51 @@
   //types
   import type { UserType } from "../types/user";
   import type { SalesByDateType } from "../types/salesByDate";
-  import type { ItemsPerfomanceType } from "../types/itemsPerformance";
+  import type { ItemsPerformanceType } from "../types/itemsPerformance";
   import type { PerformanceByDateType } from "../types/performanceByDate";
-  import type { ChannelsPerformanceType } from "../types/channelsPerformance";
-  import type { MarketplacesPerformanceType } from "../types/markeplacesPerfomance";
+
+  import type { BarVerticalChartType } from "../types/barVerticalChart";
 
   let dateRange: string = "dtd";
   const baseUrl = "https://api-prod.tradepeg.com";
 
   $: dateRange, fetchDataSummary();
+  $: loadingError;
 
   let user: UserType;
   let salesByDate: SalesByDateType;
-  let itemsPerformance: ItemsPerfomanceType[];
+  let loadingError: boolean = false;
+  let itemsPerformance: ItemsPerformanceType[];
   let performanceByDate: PerformanceByDateType[];
-  let channelsPerformance: ChannelsPerformanceType[];
+  let channelsPerformance: BarVerticalChartType[];
   let salesPerformanceByDate: PerformanceByDateType[];
   let grossPerformanceByDate: PerformanceByDateType[];
   let soldItemPerformanceByDate: PerformanceByDateType[];
   let orderCountPerformanceByDate: PerformanceByDateType[];
-  let marketplacesPerformance: MarketplacesPerformanceType[];
+  let marketplacesPerformance: BarVerticalChartType[];
 
   let dateEnd: string;
   let dateStart: string;
   let dateEndFormatted: string | string[];
   let dateStartFormatted: string | string[];
 
-  let loading: boolean = false;
-  let loadingChartSalesChart: boolean = false;
+  let loadingCards: boolean = false;
   let loadingItems: boolean = false;
   let loadingMarketChannels: boolean = false;
+  let loadingChartSalesChart: boolean = false;
 
   const getApiKey = async () => {
     const API_KEY = $page.url.searchParams.get("apiKey");
-    // hardcoded at the moment
-    axios.defaults.headers.common["Authorization"] = API_KEY
-      
+    axios.defaults.headers.common["Authorization"] = API_KEY;
   };
 
-  //"dG9rZW58eW5jOjI0OjNYMGdBZjlkWnBrSUJjUGJITHd4UktZak9scVZKVUc3NWhteXo0NnJlTU5pQ3NGdGF1MTJURVdvOHZuU1FEVmhlUDZ5QkdRT21jWDhaYnVMa0hSUzlLaUNXTTVucmdvRVlmbHQ0cElOYVQydmRKRlVqM3d6MXF4MERzN0F6UVVhZjZBdG5ZcHhpTTRxRzUzdks4ZUhtMVA5aHNSZGMwRlpCQ1hrREpOdVdvMmpUVmd3bE83eUlTRUxicmhkZ0ZwVTlsTmtNRXRYVHhXMEIyTGVmNEhWQ3FZWlNqS25zeVFpUGJvRHZSSnJ1T3dhN2N6OG1BNTZJM0cxWTFUZjBTOWs=";
+  //"?apiKey=dG9rZW58eW5jOjI0OjNYMGdBZjlkWnBrSUJjUGJITHd4UktZak9scVZKVUc3NWhteXo0NnJlTU5pQ3NGdGF1MTJURVdvOHZuU1FEVmhlUDZ5QkdRT21jWDhaYnVMa0hSUzlLaUNXTTVucmdvRVlmbHQ0cElOYVQydmRKRlVqM3d6MXF4MERzN0F6UVVhZjZBdG5ZcHhpTTRxRzUzdks4ZUhtMVA5aHNSZGMwRlpCQ1hrREpOdVdvMmpUVmd3bE83eUlTRUxicmhkZ0ZwVTlsTmtNRXRYVHhXMEIyTGVmNEhWQ3FZWlNqS25zeVFpUGJvRHZSSnJ1T3dhN2N6OG1BNTZJM0cxWTFUZjBTOWs=
 
   const fetchUser = async () => {
     try {
       const resUser = await axios.get(baseUrl + "/user/self");
       user = resUser.data;
-      /* console.log(user); */
-     console.log("user:", user);
+      /*  console.log("user:", user); */
     } catch (error) {
       console.log(error);
     }
@@ -64,10 +64,11 @@
 
   const fetchDataSummary = async () => {
     try {
+      loadingError = false;
       loadingChartSalesChart = true;
       loadingItems = true;
       loadingMarketChannels = true;
-      loading = true;
+      loadingCards = true;
 
       if (!axios.defaults.headers.common["Authorization"]) {
         await getApiKey();
@@ -78,7 +79,7 @@
       );
 
       salesByDate = resSalesByDate.data;
-      loading = false;
+
       dateStart = salesByDate.dateRanges.range1.start;
       dateEnd = salesByDate.dateRanges.range1.end;
 
@@ -97,6 +98,8 @@
         dateEndFormatted[1] +
         "/" +
         dateEndFormatted[0].substring(2);
+
+      loadingCards = false;
 
       const resPerformanceByDate = await axios.get(
         baseUrl +
@@ -122,6 +125,7 @@
       orderCountPerformanceByDate = performanceByDate.map(
         ({ dateName, orders }) => ({ dateName, orders })
       );
+
       loadingChartSalesChart = false;
 
       const resItems = await axios.get(
@@ -135,7 +139,6 @@
       itemsPerformance = resItems.data.results;
       loadingItems = false;
 
-      /*  console.log("items", itemsPerformance); */
       const resChannels = await axios.get(
         baseUrl +
           "/reports/sales-overview/performance/channels?start=" +
@@ -146,7 +149,6 @@
 
       channelsPerformance = resChannels.data.results;
 
-      /*  console.log("channels", channelsPerformance); */
       const resMarketplaces = await axios.get(
         baseUrl +
           "/reports/sales-overview/performance/marketplaces?start=" +
@@ -156,16 +158,38 @@
       );
 
       marketplacesPerformance = resMarketplaces.data.results;
-      /*  console.log("marketplaces", marketplacesPerformance); */
-      /*  console.log("salesByDate:", salesByDate); */
+
       loadingMarketChannels = false;
     } catch (error) {
+      loadingError = true;
       console.log(error);
     }
   };
 </script>
 
 <div class="min-h-screen font-sans">
+  {#if loadingError}
+    <Alert border color="red" class="flex justify-center">
+      <span slot="icon"
+        ><svg
+          aria-hidden="true"
+          class="w-5 h-5"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+          ><path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+            clip-rule="evenodd"
+          /></svg
+        >
+      </span>
+      <span class="font-medium"
+        >Something went wrong whilst loading the dashboard !</span
+      >
+      try reload the page.
+    </Alert>
+  {/if}
   <div class="flex h-[87vh] md:h-[94vh]">
     <div class="pt-10 px-2 xs:px-5 md:px-10 w-full">
       <div
@@ -176,7 +200,7 @@
           <div class="flex flex-col items-center gap-1">
             <select
               bind:value={dateRange}
-              disabled={loading}
+              disabled={loadingCards}
               id="countries"
               class="w-[170px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
@@ -194,12 +218,13 @@
               </div>
             {:then _}
               <div class="flex items-center justify-between w-[160px]">
-                {#if loading}
+                {#if loadingCards}
                   <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
                     <div
                       class="h-[30px] bg-gray-200 rounded-md dark:bg-gray-700 w-[160px]"
                     />
-                  </div>{:else}
+                  </div>
+                {:else}
                   <p>
                     {dateStartFormatted}
                   </p>
@@ -247,7 +272,7 @@
       <div
         class="flex gap-2 flex-wrap xl:flex-nowrap justify-center sm:justify-between mt-16"
       >
-        {#if loading}
+        {#if loadingCards}
           {#each { length: 4 } as _, i}
             <CardStats
               statTitle={null}
@@ -314,7 +339,7 @@
         {#if loadingItems}
           <div role="status" class=" animate-pulse">
             <div
-              class="h-[450px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[94.5vw]"
+              class="h-[550px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[94.5vw]"
             />
           </div>
         {:else}
@@ -323,31 +348,37 @@
       <div
         class="flex flex-col lg:flex-row my-12 gap-5 justify-center lg:justify-between"
       >
-          {#if loadingMarketChannels}
-            <div role="status" class=" animate-pulse">
-              <div
-                class="h-[300px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[46.7vw]"
-              />
-            </div>
-            <div role="status" class=" animate-pulse">
-              <div
-                class="h-[300px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[46.7vw]"
-              />
-            </div>
-          {:else}
-            <CardBarVerticalChart
-              data={marketplacesPerformance}
-              title={"Top Marketplaces Perfomance"}
-              filter={"marketplaceName"}
+        {#if loadingMarketChannels}
+          <div role="status" class=" animate-pulse">
+            <div
+              class="h-[300px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[46.7vw]"
             />
-            <CardBarVerticalChart
-              data={channelsPerformance}
-              title={"Top Channels Perfomance"}
-              filter={"channelName"}
+          </div>
+          <div role="status" class=" animate-pulse">
+            <div
+              class="h-[300px] bg-gray-200 rounded-md dark:bg-gray-700 w-[92vw] lg:w-[46.7vw]"
             />
-          {/if}
-     
+          </div>
+        {:else}
+          <CardBarVerticalChart
+            data={marketplacesPerformance}
+            title={"Top Performing Marketplaces"}
+            filter={"marketplaceName"}
+          />
+          <CardBarVerticalChart
+            data={channelsPerformance}
+            title={"Top Performing Channels"}
+            filter={"channelName"}
+          />
+        {/if}
       </div>
+      <footer class="py-4 bg-light mt-auto">
+        <div class="px-4">
+          <div class="flex items-center justify-center text-sm">
+            <div class="">Copyright &copy; TradePeg 2023</div>
+          </div>
+        </div>
+      </footer>
     </div>
   </div>
 </div>

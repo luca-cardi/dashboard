@@ -1,7 +1,25 @@
 @tailwind base;
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary) var(--primary);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 0.4em;
+}
+
+
+*::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #39b4ac;
+  border-radius: 14px;
+}
+
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "loto";
-}

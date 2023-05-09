@@ -1,14 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { PerformanceByDateType } from "../types/performanceByDate";
-  // library that creates chart objects in page
+
   import { Chart, registerables } from "chart.js";
   Chart.register(...registerables);
 
   export let data1: PerformanceByDateType[];
   export let data2: PerformanceByDateType[];
 
-  // init chart
   onMount(async () => {
     var config = {
       type: "line",
