@@ -17,7 +17,7 @@
 
   import type { BarVerticalChartType } from "../types/barVerticalChart";
 
-  let dateRange: string = "dtd";
+  let dateRange: string = "mtd";
   const baseUrl = "https://api-prod.tradepeg.com";
 
   $: dateRange, fetchDataSummary();

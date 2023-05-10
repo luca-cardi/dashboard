@@ -20,101 +20,80 @@
 </script>
 
 <div
-  class="relative flex flex-col justify-between min-w-0 w-[100%] sm:w-[340px] md:w-[340px] lg:w-[380px] h-[150px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+  class="relative flex flex-col justify-between min-w-0 w-[100%] sm:w-[340px] md:w-[340px] lg:w-[370px]  break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
 >
-  <div class="flex-auto p-3">
-    <div class="flex flex-wrap items-center">
-      <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
-        {#if result}
-          <h5 class="text-blueGray-400 uppercase font-bold text-sm">
+  <div class="flex-auto p-3.5">
+    <div class="flex flex-wrap items-center justify-between">
+      {#if result}
+        <div>
+          <h5 class="text-blueGray-400 uppercase text-lg font-bold">
             {statTitle}
           </h5>
-          <span class="font-semibold text-2xl text-blueGray-700">
+          <span class="font-semibold text-[30px] text-blueGray-700">
             £ {Math.round(result).toLocaleString()}
           </span>
-        {:else}
-          <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
-            <div
-              class="h-16 bg-gray-200 rounded-md dark:bg-gray-700 w-[160px] mt-1.5"
-            />
-          </div>
-        {/if}
-      </div>
-      <div class="relative pl-4 flex-initial">
-        {#if statTitle === "Sales Value"}
+        </div>
+      {:else}
+        <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
           <div
-            class="bg-[#6e6ed7] rounded-full p-3 text-xs text-white w-12 h-12"
-          >
-            <FaPoundSign />
-          </div>
-        {:else if statTitle === "Orders Count"}
-          <div
-            class="  bg-[#30c48d] rounded-full p-3 text-xs text-white w-12 h-12"
-          >
-            <FaChartBar />
-          </div>
-        {:else if statTitle === "Items Sold"}
-          <div
-            class="bg-[#f27b35] rounded-full p-3 text-xs text-white w-12 h-12"
-          >
-            <FaChartBar />
-          </div>
-        {:else if statTitle === "Gross Profit"}
-          <div
-            class="bg-[#30e3cb] rounded-full p-3 text-xs text-white w-12 h-12"
-          >
-            <FaChartLine />
-          </div>{:else}
-          <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
-            <div
-              class="h-12 bg-gray-200 rounded-full dark:bg-gray-700 w-12 mt-1.5"
-            />
-          </div>{/if}
-      </div>
-    </div>
-    <div class="flex text-sm lg:text-base text-blueGray-400 mt-8 items-center">
+            class="h-16 bg-gray-200 rounded-md dark:bg-gray-700 w-[160px] mt-1.5"
+          />
+        </div>
+      {/if}
       {#if result && previous}
-        <span class=" {result}">
-          {#if result / previous > 1}
-            <svg
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-              class="h-5 w-5 text-green-500"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75"
-              />
-            </svg>
-          {:else}
-            <svg
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-              class="h-5 text-red-600"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75"
-              />
-            </svg>
-          {/if}
-        </span>
+        <div class="items-center text-xl flex">
+          <span>
+            {#if result / previous > 1}
+              <svg
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                class="h-5 w-5 text-green-500"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75"
+                />
+              </svg>
+            {:else}
+              <svg
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                class="h-5 text-red-600"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75"
+                />
+              </svg>
+            {/if}
+          </span>
+          <span
+            class={result / previous > 1 ? "  text-green-500" : "text-red-600"}
+          >
+            {percentage}%</span
+          >
+        </div>
+      {:else}<p />{/if}
+    </div>
+    <div class="flex text-sm lg:text-base text-blueGray-400 mt-2 items-end">
+      {#if result && previous}
+       
+      
+           
+
         <span
-          class={result / previous > 1 ? " text-green-500" : "text-red-600"}
+          class=" ml-1.5 xl:ml-0 xs:ml-2.5 text-[10px] xs:text-[13px] lg:text-[15px]"
         >
-          {percentage}%</span
-        >
-        <span class=" ml-1.5 xs:ml-2.5 text-[10px] xs:text-[13px]">
           {#if dateRange === "dtd"}
             Compared to yesterday
           {:else if dateRange === "wtd"}
@@ -127,9 +106,9 @@
             Compared to last year
           {/if}</span
         >
-        <div class=" w-auto pl-4  ml-auto text-center">
+        <div class=" w-auto pl-4 ml-auto text-center">
           <h6
-            class="text-blueGray-400 uppercase font-semibold  text-[10px] xs:text-sm"
+            class="text-blueGray-400 uppercase font-semibold text-[10px] xs:text-sm lg:text-lg"
           >
             Previous
           </h6>
