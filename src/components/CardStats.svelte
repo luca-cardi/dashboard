@@ -20,7 +20,7 @@
 </script>
 
 <div
-  class="relative flex flex-col justify-between min-w-0 w-[100%] sm:w-[340px] md:w-[340px] lg:w-[370px]  break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+  class="relative flex flex-col justify-between min-w-0 w-[100%] sm:w-[340px] md:w-[340px] lg:w-[370px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
 >
   <div class="flex-auto p-3.5">
     <div class="flex flex-wrap items-center justify-between">
@@ -83,14 +83,17 @@
             {percentage}%</span
           >
         </div>
-      {:else}<p />{/if}
+      {:else}
+        <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+          <div
+            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[100px]"
+          />
+        </div>{/if}
     </div>
-    <div class="flex text-sm lg:text-base text-blueGray-400 mt-2 items-end">
+    <div
+      class="flex text-sm lg:text-base text-blueGray-400 mt-2 items-end justify-between"
+    >
       {#if result && previous}
-       
-      
-           
-
         <span
           class=" ml-1.5 xl:ml-0 xs:ml-2.5 text-[10px] xs:text-[13px] lg:text-[15px]"
         >
@@ -119,7 +122,12 @@
       {:else}
         <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
           <div
-            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[250px] sm:w-[280px]"
+            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[150px]"
+          />
+        </div>
+        <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+          <div
+            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[150px]"
           />
         </div>
       {/if}

@@ -34,6 +34,7 @@
   let soldItemPerformanceByDate: PerformanceByDateType[];
   let orderCountPerformanceByDate: PerformanceByDateType[];
   let marketplacesPerformance: BarVerticalChartType[];
+  let customersPerformance: BarVerticalChartType[];
 
   let dateEnd: string;
   let dateStart: string;
@@ -49,8 +50,6 @@
     const API_KEY = $page.url.searchParams.get("apiKey");
     axios.defaults.headers.common["Authorization"] = API_KEY;
   };
-
-  //"?apiKey=dG9rZW58eW5jOjI0OjNYMGdBZjlkWnBrSUJjUGJITHd4UktZak9scVZKVUc3NWhteXo0NnJlTU5pQ3NGdGF1MTJURVdvOHZuU1FEVmhlUDZ5QkdRT21jWDhaYnVMa0hSUzlLaUNXTTVucmdvRVlmbHQ0cElOYVQydmRKRlVqM3d6MXF4MERzN0F6UVVhZjZBdG5ZcHhpTTRxRzUzdks4ZUhtMVA5aHNSZGMwRlpCQ1hrREpOdVdvMmpUVmd3bE83eUlTRUxicmhkZ0ZwVTlsTmtNRXRYVHhXMEIyTGVmNEhWQ3FZWlNqS25zeVFpUGJvRHZSSnJ1T3dhN2N6OG1BNTZJM0cxWTFUZjBTOWs=
 
   const fetchUser = async () => {
     try {
@@ -149,7 +148,8 @@
 
       channelsPerformance = resChannels.data.results;
 
-      const resMarketplaces = await axios.get(
+/*    
+   const resMarketplaces = await axios.get(
         baseUrl +
           "/reports/sales-overview/performance/marketplaces?start=" +
           dateStart +
@@ -157,7 +157,17 @@
           dateEnd
       );
 
-      marketplacesPerformance = resMarketplaces.data.results;
+      marketplacesPerformance = resMarketplaces.data.results; */
+
+      const resCustomers = await axios.get(
+        baseUrl +
+          "/reports/sales-overview/performance/customers?start=" +
+          dateStart +
+          "&end=" +
+          dateEnd
+      );
+
+      customersPerformance = resCustomers.data.results;
 
       loadingMarketChannels = false;
     } catch (error) {
@@ -361,9 +371,9 @@
           </div>
         {:else}
           <CardBarVerticalChart
-            data={marketplacesPerformance}
-            title={"Top Performing Marketplaces"}
-            filter={"marketplaceName"}
+            data={customersPerformance}
+            title={"Top Performing Customers"}
+            filter={"name"}
           />
           <CardBarVerticalChart
             data={channelsPerformance}

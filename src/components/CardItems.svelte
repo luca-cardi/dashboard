@@ -2,8 +2,6 @@
   import type { ItemsPerformanceType } from "../types/itemsPerformance";
   export let tableData: ItemsPerformanceType[];
   import FaMedal from "svelte-icons/fa/FaMedal.svelte";
-  import GiLaurelsTrophy from "svelte-icons/gi/GiLaurelsTrophy.svelte";
-  import GiTrophy from "svelte-icons/gi/GiTrophy.svelte";
   import GiTrophyCup from "svelte-icons/gi/GiTrophyCup.svelte";
 
   let filterValue: string = "salesValueGross";
@@ -77,7 +75,7 @@
                   <FaMedal />
                 </p>{:else}<p
                   class="sm:hidden !w-[20px] text-[#C0C0C0]"
-                />{/if}{data.itemSKU}
+                />{/if}{data.itemSku}
             </div>
           </td>
           <td class=" pr-4 text-right"

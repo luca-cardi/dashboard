@@ -1,4 +1,5 @@
 export type BarVerticalChartType = {
+  name?: string;
   channelName?: string;
   marketplaceName?: string;
   grossProfit: number;
