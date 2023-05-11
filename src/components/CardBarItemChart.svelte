@@ -46,7 +46,7 @@
           },
           title: {
             display: true,
-            text: "Order Performance",
+            text: "Order Insights",
             align: "start",
             color: "black",
             font: {

@@ -42,7 +42,7 @@
           },
           title: {
             display: true,
-            text: "Sales Performance",
+            text: "Sales Insights",
             align: "start",
             color: "black",
             font: {

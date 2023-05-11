@@ -21,7 +21,7 @@
 </script>
 
 <div
-  class="relative flex flex-col justify-between min-w-0 w-[90%] sm:w-[300px] lg:w-[220px] xl:w-[330px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+  class="relative flex flex-col justify-between min-w-0 w-[100%] sm:w-[300px] md:w-[49%] lg:w-full break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
 >
   <div class="flex flex-col items-center p-3.5 gap-3">
     <div class=" self-start">
@@ -35,7 +35,7 @@
     </div>
     {#if result}
       <div class=" self-center justify-self-center max-w-fit">
-        <span class="font-semibold text-[35px] lg:text-[50px] text-blueGray-700">
+        <span class="font-semibold text-[50px] lg:text-[35px] xl:text-[50px] text-blueGray-700">
           {#if statTitle === "Sales Value" || statTitle === "Gross Profit"}
            {currencySymbol}
           {/if}

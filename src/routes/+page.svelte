@@ -9,6 +9,9 @@
   import CardBarItemChart from "../components/CardBarItemChart.svelte";
   import CardBarVerticalChart from "../components/CardBarVerticalChart.svelte";
 
+  import { DatePicker, DatePickerInput } from "carbon-components-svelte";
+  import "carbon-components-svelte/css/white.css";
+
   //types
   import type { UserType } from "../types/user";
   import type { SalesByDateType } from "../types/salesByDate";
@@ -17,14 +20,20 @@
 
   import type { BarVerticalChartType } from "../types/barVerticalChart";
 
+  import Cookies from "js-cookie";
+
   let dateRange: string = "mtd";
   const baseUrl = "https://api-prod.tradepeg.com";
 
-  $: dateRange, fetchDataSummary();
+  $: dateRange, fetchDataSummary(false);
   $: loadingError;
+
+  let customDateStart: any;
+  let customDateEnd: any;
 
   let user: UserType;
   let currencySymbol: string;
+  let customDate: boolean = false;
   let salesByDate: SalesByDateType;
   let loadingError: boolean = false;
   let itemsPerformance: ItemsPerformanceType[];
@@ -48,10 +57,23 @@
   let loadingChartSalesChart: boolean = false;
 
   const getApiKey = async () => {
-    const API_KEY = $page.url.searchParams.get("apiKey");
-    axios.defaults.headers.common["Authorization"] = API_KEY;
-  };
+    let API_KEY: string | null;
+    if (Cookies.get("api_key_insights")) {
+      axios.defaults.headers.common["Authorization"] =
+        Cookies.get("api_key_insights");
+    } else {
+      API_KEY = $page.url.searchParams.get("apiKey");
+      axios.defaults.headers.common["Authorization"] = API_KEY;
+      Cookies.set("api_key_insights", API_KEY!);
+    }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    // Remove the API key parameter from the URL
+    urlParams.delete("apiKey");
+    const newUrl =
+      window.location.origin + window.location.pathname + urlParams.toString();
+    window.history.replaceState({}, "", newUrl);
+  };
   const fetchUser = async () => {
     try {
       const resUser = await axios.get(baseUrl + "/user/self");
@@ -62,8 +84,38 @@
     }
   };
 
-  const fetchDataSummary = async () => {
+  const formatCustomDate = (value: Date) => {
+    const date = new Date(value);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatDateUi = (value: string) => {
+    const [year, month, day] = value.split("-");
+    return `${day}/${month}/${year.slice(-2)}`;
+  };
+
+  const setRangeDate = (e: Date[]) => {
+    customDateStart = formatCustomDate(e[0]);
+
+    if (e.length > 1) {
+      customDateEnd = formatCustomDate(e[1]);
+    }
+
+    console.log(customDateStart, customDateEnd);
+  };
+
+  const fetchDataSummary = async (isCustom: boolean) => {
+    console.log(isCustom);
+    if (dateRange === "custom" && !isCustom) {
+      customDate = true;
+      return;
+    }
+
     try {
+      customDate = false;
       loadingError = false;
       loadingChartSalesChart = true;
       loadingItems = true;
@@ -74,30 +126,33 @@
         await getApiKey();
       }
 
-      const resSalesByDate = await axios.get(
-        baseUrl + "/reports/sales-overview/summary/" + dateRange
-      );
-
-      salesByDate = resSalesByDate.data;
-
-      dateStart = salesByDate.dateRanges.range1.start;
-      dateEnd = salesByDate.dateRanges.range1.end;
-
-      // format data for ui
-      dateStartFormatted = salesByDate.dateRanges.range1.start.split("-");
-      dateStartFormatted =
-        dateStartFormatted[2] +
-        "/" +
-        dateStartFormatted[1] +
-        "/" +
-        dateStartFormatted[0].substring(2);
-      dateEndFormatted = salesByDate.dateRanges.range1.end.split("-");
-      dateEndFormatted =
-        dateEndFormatted[2] +
-        "/" +
-        dateEndFormatted[1] +
-        "/" +
-        dateEndFormatted[0].substring(2);
+      if (isCustom) {
+        const resSalesByDate = await axios.get(
+          baseUrl +
+            "/reports/sales-overview/summary?start=" +
+            customDateStart +
+            "&end=" +
+            customDateEnd
+        );
+        salesByDate = resSalesByDate.data;
+        dateStart = customDateStart;
+        dateEnd = customDateEnd;
+        dateStartFormatted = formatDateUi(dateStart);
+        dateEndFormatted = formatDateUi(dateEnd);
+        console.log("custom", dateEnd, dateStart);
+        console.log(resSalesByDate);
+      } else {
+        const resSalesByDate = await axios.get(
+          baseUrl + "/reports/sales-overview/summary/" + dateRange
+        );
+        salesByDate = resSalesByDate.data;
+        dateStart = salesByDate.dateRanges.range1.start;
+        dateEnd = salesByDate.dateRanges.range1.end;
+        console.log("no custom", dateEnd, dateStart);
+        // format data for ui
+        dateStartFormatted = formatDateUi(dateStart);
+        dateEndFormatted = formatDateUi(dateEnd);
+      }
 
       loadingCards = false;
 
@@ -110,6 +165,7 @@
       );
 
       performanceByDate = resPerformanceByDate.data.results;
+      console.log(performanceByDate);
 
       salesPerformanceByDate = performanceByDate.map(
         ({ dateName, salesValueGross }) => ({ dateName, salesValueGross })
@@ -137,6 +193,7 @@
       );
 
       itemsPerformance = resItems.data.results;
+      console.log(itemsPerformance);
       loadingItems = false;
 
       const resChannels = await axios.get(
@@ -196,7 +253,7 @@
         >
       </span>
       <span class="font-medium"
-        >Something went wrong whilst loading the dashboard !</span
+        >Something went wrong whilst loading the dashboard!</span
       >
       try reload the page.
     </Alert>
@@ -209,7 +266,7 @@
         <h2 class="xs:hidden sm:block text-[30px] font-semibold">Insights</h2>
         <div class="flex flex-col-reverse sm:flex-row items-center gap-10">
           <div class="flex flex-col items-center gap-1">
-            <div class="relative">
+            <div>
               <div class="relative">
                 <select
                   bind:value={dateRange}
@@ -218,10 +275,21 @@
                   class="w-[170px] mt-3 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                   <option selected value="dtd">Day to date</option>
-                  <option value="wtd">Week to date</option>
-                  <option value="mtd">Month to date</option>
-                  <option value="qtd">Quarter to date</option>
-                  <option value="ytd">Year to date</option>
+                  <option value="wtd" on:click={() => (customDate = false)}
+                    >Week to date</option
+                  >
+                  <option value="mtd" on:click={() => (customDate = false)}
+                    >Month to date</option
+                  >
+                  <option value="qtd" on:click={() => (customDate = false)}
+                    >Quarter to date</option
+                  >
+                  <option value="ytd" on:click={() => (customDate = false)}
+                    >Year to date</option
+                  >
+          <!--         <option value="custom" on:click={() => (customDate = true)}
+                    >Custom</option
+                  > -->
                 </select>
                 <label
                   for="disabled_outlined"
@@ -229,46 +297,70 @@
                   >Date range</label
                 >
               </div>
-            </div>
-
-            {#await fetchDataSummary()}
-              <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+              {#if customDate}
                 <div
-                  class="h-[30px] bg-gray-200 rounded-full dark:bg-gray-700 w-[160px]"
-                />
-              </div>
-            {:then _}
-              <div class="flex items-center justify-between w-[160px]">
-                {#if loadingCards}
-                  <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
-                    <div
-                      class="h-[30px] bg-gray-200 rounded-md dark:bg-gray-700 w-[160px]"
-                    />
-                  </div>
-                {:else}
-                  <p>
-                    {dateStartFormatted}
-                  </p>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-4 h-4 text-gray-600"
+                  class="z-20 bg-white border-black border-2 absolute p-3 top-[50px] right-[250px] flex flex-col items-center gap-3 rounded shadow-lg"
+                >
+                  <DatePicker
+                    datePickerType="range"
+                    dateFormat="d/m/y"
+                    on:change={(e) => setRangeDate(e.detail.selectedDates)}
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
+                    <DatePickerInput
+                      labelText="Start date"
+                      placeholder="dd/mm/yyyy"
                     />
-                  </svg>
-                  <p>
-                    {dateEndFormatted}
-                  </p>
-                {/if}
-              </div>
-            {/await}
+                    <DatePickerInput
+                      labelText="End date"
+                      placeholder="dd/mm/yyyy"
+                    />
+                  </DatePicker>
+                  <div class="flex gap-5">
+                    <button
+                      class="p-2"
+                      on:click={() => {
+                        customDate = false;
+                        dateRange = "wtd";
+                      }}>Cancel</button
+                    >
+                    <button class="p-2" on:click={() => fetchDataSummary(true)}
+                      >Select</button
+                    >
+                  </div>
+                </div>
+              {/if}
+            </div>
+            {#await fetchDataSummary(false)}{/await}
+            <div class="flex items-center justify-between w-[160px]">
+              {#if loadingCards}
+                <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+                  <div
+                    class="h-[30px] bg-gray-200 rounded-md dark:bg-gray-700 w-[160px]"
+                  />
+                </div>
+              {:else}
+                <p>
+                  {dateStartFormatted}
+                </p>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-4 h-4 text-gray-600"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
+                  />
+                </svg>
+                <p>
+                  {dateEndFormatted}
+                </p>
+              {/if}
+            </div>
           </div>
           {#await fetchUser()}
             <div role="status" class=" animate-pulse max-w-lg">
@@ -276,7 +368,9 @@
             </div>
           {:then _}
             <div class="flex items-center gap-3">
-              <h2 class="hidden xs:block sm:hidden text-[20px] mr-10 font-semibold">
+              <h2
+                class="hidden xs:block sm:hidden text-[20px] mr-10 font-semibold"
+              >
                 Insights
               </h2>
               <div>
@@ -291,7 +385,7 @@
         </div>
       </div>
       <div
-        class="flex gap-2 flex-wrap xl:flex-nowrap justify-center sm:justify-between mt-16"
+        class="flex gap-2 flex-wrap lg:flex-nowrap justify-center sm:justify-between mt-16"
       >
         {#if loadingCards}
           {#each { length: 4 } as _, i}
@@ -299,7 +393,7 @@
               statTitle={null}
               result={null}
               previous={null}
-              currencySymbol={''}
+              currencySymbol={""}
               {dateRange}
             />
           {/each}
@@ -307,28 +401,28 @@
           <CardStats
             statTitle={"Sales Value"}
             result={salesByDate.results.salesValueGross}
-            previous={salesByDate.previous.salesValueGross}
+            previous={salesByDate.previous?.salesValueGross}
             {currencySymbol}
             {dateRange}
           />
           <CardStats
             statTitle={"Gross Profit"}
             result={salesByDate.results.grossProfit}
-            previous={salesByDate.previous.grossProfit}
+            previous={salesByDate.previous?.grossProfit}
             {currencySymbol}
             {dateRange}
           />
           <CardStats
             statTitle={"Orders Count"}
             result={salesByDate.results.orders}
-            previous={salesByDate.previous.orders}
+            previous={salesByDate.previous?.orders}
             {currencySymbol}
             {dateRange}
           />
           <CardStats
             statTitle={"Items Sold"}
             result={salesByDate.results.itemsSold}
-            previous={salesByDate.previous.itemsSold}
+            previous={salesByDate.previous?.itemsSold}
             {currencySymbol}
             {dateRange}
           />

@@ -60,7 +60,8 @@
           </td>
 
           <td class=" pr-4 text-right"
-            >{currencySymbol} {Math.round(data.salesValueGross).toLocaleString()}
+            >{currencySymbol}
+            {Math.round(data.salesValueGross).toLocaleString()}
           </td>
           <td class=" pr-2 text-right">{data.itemsSold.toLocaleString()}</td>
         </tr>
