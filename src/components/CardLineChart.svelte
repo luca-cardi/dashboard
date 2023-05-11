@@ -65,7 +65,7 @@
 </script>
 
 <div
-  class="relative flex flex-col min-w-0 break-words lg:w-[70%] mb-6 shadow-lg rounded-md bg-gray-100"
+  class="relative flex flex-col min-w-0 break-words lg:w-[70%] mb-6 shadow-lg rounded-md bg-white "
 >
   <div class="p-5 flex-auto">
     <!-- Chart -->

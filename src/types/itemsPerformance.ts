@@ -1,6 +1,5 @@
 export type ItemsPerformanceType = {
   itemSku: string;
-  itemSKU: string;
   itemTitle: string;
   grossProfit: number;
   grossProfitMargin: number;

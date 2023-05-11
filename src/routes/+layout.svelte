@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Dashboard</title>
+	<title>Insights</title>
 </svelte:head>
 
 <slot />

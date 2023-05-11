@@ -9,6 +9,8 @@ export type UserType = {
     name: string;
     portalUrl: string;
     taxNumber: string;
+    currency: string;
+    currencySymbol: string;
   };
   role: string;
 };

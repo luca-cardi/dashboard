@@ -1,16 +1,17 @@
 <script lang="ts">
+  export let currencySymbol: string;
   export let dateRange: string;
   export let result: number | null;
   export let previous: number | null;
   export let statTitle: string | null;
 
-  let percentage: string = "";
+  let percentage: number;
 
   if (result && previous) {
     if (result > previous) {
-      percentage = (((result - previous) / previous) * 100).toFixed(2);
+      percentage = Math.round(((result - previous) / previous) * 100);
     } else {
-      percentage = (((previous - result) / previous) * 100).toFixed(2);
+      percentage = Math.round(((previous - result) / previous) * 100);
     }
   }
 
@@ -20,28 +21,38 @@
 </script>
 
 <div
-  class="relative flex flex-col justify-between min-w-0 w-[100%] sm:w-[340px] md:w-[340px] lg:w-[370px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+  class="relative flex flex-col justify-between min-w-0 w-[90%] sm:w-[300px] lg:w-[220px] xl:w-[330px] break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
 >
-  <div class="flex-auto p-3.5">
-    <div class="flex flex-wrap items-center justify-between">
-      {#if result}
-        <div>
-          <h5 class="text-blueGray-400 uppercase text-lg font-bold">
-            {statTitle}
-          </h5>
-          <span class="font-semibold text-[30px] text-blueGray-700">
-            £ {Math.round(result).toLocaleString()}
-          </span>
-        </div>
-      {:else}
+  <div class="flex flex-col items-center p-3.5 gap-3">
+    <div class=" self-start">
+      {#if statTitle}
+        <h5 class="text-blueGray-400 text-lg font-semibold text-gray-500">
+          {statTitle}
+        </h5>{:else}
         <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
-          <div
-            class="h-16 bg-gray-200 rounded-md dark:bg-gray-700 w-[160px] mt-1.5"
-          />
-        </div>
-      {/if}
+          <div class="h-6 bg-gray-200 rounded-md dark:bg-gray-700 w-[100px]" />
+        </div>{/if}
+    </div>
+    {#if result}
+      <div class=" self-center justify-self-center max-w-fit">
+        <span class="font-semibold text-[35px] lg:text-[50px] text-blueGray-700">
+          {#if statTitle === "Sales Value" || statTitle === "Gross Profit"}
+           {currencySymbol}
+          {/if}
+          {Math.round(result).toLocaleString()}
+        </span>
+      </div>
+    {:else}
+      <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+        <div
+          class="h-14 bg-gray-200 rounded-md dark:bg-gray-700 w-[200px] mt-1.5"
+        />
+      </div>
+    {/if}
+
+    <div class="flex  text-blueGray-400 mt-2 items-end">
       {#if result && previous}
-        <div class="items-center text-xl flex">
+        <div class="items-center text-xl flex mr-4">
           <span>
             {#if result / previous > 1}
               <svg
@@ -84,19 +95,13 @@
           >
         </div>
       {:else}
-        <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
-          <div
-            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[100px]"
-          />
+        <div role="status" class="space-y-2.5 animate-pulse max-w-lg mt-2">
+          <div class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[80px]" />
         </div>{/if}
     </div>
-    <div
-      class="flex text-sm lg:text-base text-blueGray-400 mt-2 items-end justify-between"
-    >
-      {#if result && previous}
-        <span
-          class=" ml-1.5 xl:ml-0 xs:ml-2.5 text-[10px] xs:text-[13px] lg:text-[15px]"
-        >
+    {#if result && previous}
+      <div class="-mt-2">
+        <span class=" text-[15px]">
           {#if dateRange === "dtd"}
             Compared to yesterday
           {:else if dateRange === "wtd"}
@@ -109,28 +114,11 @@
             Compared to last year
           {/if}</span
         >
-        <div class=" w-auto pl-4 ml-auto text-center">
-          <h6
-            class="text-blueGray-400 uppercase font-semibold text-[10px] xs:text-sm lg:text-lg"
-          >
-            Previous
-          </h6>
-          <span class="font-semibold text-xs lg:text-base text-blueGray-700">
-            £ {Math.round(previous).toLocaleString()}
-          </span>
-        </div>
-      {:else}
-        <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
-          <div
-            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[150px]"
-          />
-        </div>
-        <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
-          <div
-            class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[150px]"
-          />
-        </div>
-      {/if}
-    </div>
+      </div>
+    {:else}
+      <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+        <div class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[150px]" />
+      </div>
+    {/if}
   </div>
 </div>
