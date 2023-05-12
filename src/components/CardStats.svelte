@@ -15,9 +15,6 @@
     }
   }
 
-  import FaChartLine from "svelte-icons/fa/FaChartLine.svelte";
-  import FaPoundSign from "svelte-icons/fa/FaPoundSign.svelte";
-  import FaChartBar from "svelte-icons/fa/FaChartBar.svelte";
 </script>
 
 <div
@@ -26,7 +23,7 @@
   <div class="flex flex-col items-center p-3.5 gap-3">
     <div class=" self-start">
       {#if statTitle}
-        <h5 class="text-blueGray-400 text-lg font-semibold text-gray-500">
+        <h5 class=" text-lg font-semibold text-gray-500">
           {statTitle}
         </h5>{:else}
         <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
@@ -35,9 +32,11 @@
     </div>
     {#if result}
       <div class=" self-center justify-self-center max-w-fit">
-        <span class="font-semibold text-[50px] lg:text-[35px] xl:text-[50px] text-blueGray-700">
+        <span
+          class="font-semibold text-[50px] lg:text-[35px] xl:text-[50px] text-blueGray-700"
+        >
           {#if statTitle === "Sales Value" || statTitle === "Gross Profit"}
-           {currencySymbol}
+            {currencySymbol}
           {/if}
           {Math.round(result).toLocaleString()}
         </span>
@@ -49,12 +48,13 @@
         />
       </div>
     {/if}
-
-    <div class="flex  text-blueGray-400 mt-2 items-end">
-      {#if result && previous}
+    <div class="flex text-blueGray-400 mt-2 items-end">
+      {#if result}
         <div class="items-center text-xl flex mr-4">
           <span>
-            {#if result / previous > 1}
+            {#if !previous}
+              <p />
+            {:else if result / previous > 1}
               <svg
                 fill="none"
                 stroke="currentColor"
@@ -70,7 +70,7 @@
                   d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75"
                 />
               </svg>
-            {:else}
+            {:else if result / previous < 1}
               <svg
                 fill="none"
                 stroke="currentColor"
@@ -88,18 +88,21 @@
               </svg>
             {/if}
           </span>
-          <span
-            class={result / previous > 1 ? "  text-green-500" : "text-red-600"}
-          >
-            {percentage}%</span
-          >
+          {#if previous}
+            <span
+              class={result / previous > 1
+                ? "  text-green-500"
+                : "text-red-600"}
+            >
+              {percentage}%</span
+            >{:else}<span />{/if}
         </div>
       {:else}
         <div role="status" class="space-y-2.5 animate-pulse max-w-lg mt-2">
           <div class="h-7 bg-gray-200 rounded-full dark:bg-gray-700 w-[80px]" />
         </div>{/if}
     </div>
-    {#if result && previous}
+    {#if result}
       <div class="-mt-2">
         <span class=" text-[15px]">
           {#if dateRange === "dtd"}
@@ -112,8 +115,10 @@
             Compared to last quarter
           {:else if dateRange === "ytd"}
             Compared to last year
-          {/if}</span
-        >
+          {:else}
+            <span />
+          {/if}
+          </span>
       </div>
     {:else}
       <div role="status" class="space-y-2.5 animate-pulse max-w-lg">

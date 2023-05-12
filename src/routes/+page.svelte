@@ -58,11 +58,13 @@
 
   const getApiKey = async () => {
     let API_KEY: string | null;
-    if (Cookies.get("api_key_insights")) {
+    const cookie = Cookies.get("api_key_insights");
+    API_KEY = $page.url.searchParams.get("apiKey");
+
+    if (!API_KEY) {
       axios.defaults.headers.common["Authorization"] =
         Cookies.get("api_key_insights");
     } else {
-      API_KEY = $page.url.searchParams.get("apiKey");
       axios.defaults.headers.common["Authorization"] = API_KEY;
       Cookies.set("api_key_insights", API_KEY!);
     }
@@ -76,6 +78,9 @@
   };
   const fetchUser = async () => {
     try {
+      if (!axios.defaults.headers.common["Authorization"]) {
+        await getApiKey();
+      }
       const resUser = await axios.get(baseUrl + "/user/self");
       user = resUser.data;
       currencySymbol = user.organization.currencySymbol;
@@ -103,12 +108,9 @@
     if (e.length > 1) {
       customDateEnd = formatCustomDate(e[1]);
     }
-
-    console.log(customDateStart, customDateEnd);
   };
 
   const fetchDataSummary = async (isCustom: boolean) => {
-    console.log(isCustom);
     if (dateRange === "custom" && !isCustom) {
       customDate = true;
       return;
@@ -125,7 +127,6 @@
       if (!axios.defaults.headers.common["Authorization"]) {
         await getApiKey();
       }
-
       if (isCustom) {
         const resSalesByDate = await axios.get(
           baseUrl +
@@ -139,8 +140,8 @@
         dateEnd = customDateEnd;
         dateStartFormatted = formatDateUi(dateStart);
         dateEndFormatted = formatDateUi(dateEnd);
-        console.log("custom", dateEnd, dateStart);
-        console.log(resSalesByDate);
+        /*         console.log("custom", dateEnd, dateStart);
+        console.log(resSalesByDate); */
       } else {
         const resSalesByDate = await axios.get(
           baseUrl + "/reports/sales-overview/summary/" + dateRange
@@ -148,7 +149,7 @@
         salesByDate = resSalesByDate.data;
         dateStart = salesByDate.dateRanges.range1.start;
         dateEnd = salesByDate.dateRanges.range1.end;
-        console.log("no custom", dateEnd, dateStart);
+        /*    console.log("no custom", dateEnd, dateStart); */
         // format data for ui
         dateStartFormatted = formatDateUi(dateStart);
         dateEndFormatted = formatDateUi(dateEnd);
@@ -165,7 +166,6 @@
       );
 
       performanceByDate = resPerformanceByDate.data.results;
-      console.log(performanceByDate);
 
       salesPerformanceByDate = performanceByDate.map(
         ({ dateName, salesValueGross }) => ({ dateName, salesValueGross })
@@ -193,7 +193,7 @@
       );
 
       itemsPerformance = resItems.data.results;
-      console.log(itemsPerformance);
+
       loadingItems = false;
 
       const resChannels = await axios.get(
@@ -205,17 +205,6 @@
       );
 
       channelsPerformance = resChannels.data.results;
-
-      /*    
-   const resMarketplaces = await axios.get(
-        baseUrl +
-          "/reports/sales-overview/performance/marketplaces?start=" +
-          dateStart +
-          "&end=" +
-          dateEnd
-      );
-
-      marketplacesPerformance = resMarketplaces.data.results; */
 
       const resCustomers = await axios.get(
         baseUrl +
@@ -275,21 +264,11 @@
                   class="w-[170px] mt-3 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                   <option selected value="dtd">Day to date</option>
-                  <option value="wtd" on:click={() => (customDate = false)}
-                    >Week to date</option
-                  >
-                  <option value="mtd" on:click={() => (customDate = false)}
-                    >Month to date</option
-                  >
-                  <option value="qtd" on:click={() => (customDate = false)}
-                    >Quarter to date</option
-                  >
-                  <option value="ytd" on:click={() => (customDate = false)}
-                    >Year to date</option
-                  >
-          <!--         <option value="custom" on:click={() => (customDate = true)}
-                    >Custom</option
-                  > -->
+                  <option value="wtd">Week to date</option>
+                  <option value="mtd">Month to date</option>
+                  <option value="qtd">Quarter to date</option>
+                  <option value="ytd">Year to date</option>
+                  <option value="custom">Custom</option>
                 </select>
                 <label
                   for="disabled_outlined"
@@ -304,7 +283,11 @@
                   <DatePicker
                     datePickerType="range"
                     dateFormat="d/m/y"
-                    on:change={(e) => setRangeDate(e.detail.selectedDates)}
+                    maxDate={new Date()}
+                    on:change={(e) => {
+                      // @ts-ignore
+                      setRangeDate(e.detail.selectedDates);
+                    }}
                   >
                     <DatePickerInput
                       labelText="Start date"
@@ -330,7 +313,7 @@
                 </div>
               {/if}
             </div>
-            {#await fetchDataSummary(false)}{/await}
+            {#await fetchDataSummary(false)}<p />{/await}
             <div class="flex items-center justify-between w-[160px]">
               {#if loadingCards}
                 <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
@@ -385,7 +368,7 @@
         </div>
       </div>
       <div
-        class="flex gap-2 flex-wrap lg:flex-nowrap justify-center sm:justify-between mt-16"
+        class="flex gap-2.5 flex-wrap lg:flex-nowrap justify-center sm:justify-between mt-16"
       >
         {#if loadingCards}
           {#each { length: 4 } as _, i}

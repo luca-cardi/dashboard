@@ -21,7 +21,7 @@
 
 <div class="p-5 bg-white rounded shadow-lg w-full">
   <div class="flex justify-between items-center mb-6">
-    <h4 class="font-bold text-[20px]">Top Items</h4>
+    <h4 class="font-bold text-[20px] text-gray-500">Top Items</h4>
     <select
       bind:value={sortValue}
       id="countries"
@@ -31,7 +31,6 @@
       <option value="itemsSold">By Sold Items</option>
     </select>
   </div>
-
   <table class=" w-full table-sort table-arrows">
     <thead>
       <tr class="text-left bg-gray-200">
@@ -39,8 +38,8 @@
         <th class="min-w-[60px] hidden sm:block border-separate py-3">Title</th>
         <th class=" pr-4 text-right">Sales Value</th>
         <th class="pr-2 text-right">Items Sold</th>
-      </tr></thead
-    >
+      </tr>
+    </thead>
     <tbody class=" [&>*:nth-child(even)]:bg-gray-100">
       {#each tableData as data, i}
         <tr>
@@ -58,9 +57,8 @@
               </p>
             </div>
           </td>
-
-          <td class=" pr-4 text-right"
-            >{currencySymbol}
+          <td class=" pr-4 text-right">
+            {currencySymbol}
             {Math.round(data.salesValueGross).toLocaleString()}
           </td>
           <td class=" pr-2 text-right">{data.itemsSold.toLocaleString()}</td>

@@ -44,7 +44,7 @@
             display: true,
             text: "Sales Insights",
             align: "start",
-            color: "black",
+            color: "#6b7280",
             font: {
               size: 20,
               family: "'Open Sans', sans-serif"
